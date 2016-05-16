@@ -1,5 +1,5 @@
 Pod::Spec.new do |s|
-  s.name             = "react-native-social-sdk"
+  s.name             = "react-native-social-kit"
   s.version          = "0.0.1"
   s.platform     = :ios, '7.0'
   s.requires_arc = true 

@@ -1,4 +1,4 @@
-package com.yoai.reactnative.socialsdk;
+package com.yoai.reactnative.social;
 
 import android.util.Log;
 

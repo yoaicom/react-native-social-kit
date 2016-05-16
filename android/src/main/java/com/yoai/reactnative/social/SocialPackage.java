@@ -1,13 +1,13 @@
-package com.yoai.reactnative.socialsdk;
+package com.yoai.reactnative.social;
 
 import com.facebook.react.ReactPackage;
 import com.facebook.react.bridge.JavaScriptModule;
 import com.facebook.react.bridge.NativeModule;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.uimanager.ViewManager;
-import com.yoai.reactnative.socialsdk.qq.QQModule;
-import com.yoai.reactnative.socialsdk.weibo.WeiboModule;
-import com.yoai.reactnative.socialsdk.weixin.WeixinModule;
+import com.yoai.reactnative.social.qq.QQModule;
+import com.yoai.reactnative.social.weibo.WeiboModule;
+import com.yoai.reactnative.social.weixin.WeixinModule;
 
 import java.util.Arrays;
 import java.util.Collections;

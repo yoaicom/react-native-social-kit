@@ -1,36 +1,31 @@
-//
-//  WeixinModule.m
-//  ReactAppBase
-//
-//  Created by 张天 on 16/3/7.
-//  Copyright © 2016年 YOAI. All rights reserved.
-//
-
 #import "WeixinModule.h"
+#import "WXApiObject.h"
 
 static RCTResponseSenderBlock authCallback;
+static NSString* authState;
 
 @implementation WeixinModule
 
 + (BOOL)handleOpenURL:(NSURL *)url {
-  WeixinModule *module = [[WeixinModule alloc]init];
   NSLog(@"URL :%@ ",url);
+  
+  WeixinModule *module = [[WeixinModule alloc]init];
   return [WXApi handleOpenURL:url delegate:module];
 }
 
 RCT_EXPORT_MODULE(Weixin);
 
 RCT_EXPORT_METHOD(authorize:(NSDictionary *)config : (RCTResponseSenderBlock)callback) {
-  NSLog(@"发送授权请求");
-  
   NSString *appId = [config objectForKey:@"appId"];
   [WXApi registerApp:appId];
   
   authCallback = callback;
+  authState = [self randomString];
   
   SendAuthReq* req =[[SendAuthReq alloc] init];
   req.scope = @"snsapi_userinfo" ;
-  req.state = [config objectForKey:@"state"];
+  req.state = authState;
+  
   //第三方向微信终端发送一个SendAuthReq消息结构
   [WXApi sendReq:req];
   
@@ -38,31 +33,40 @@ RCT_EXPORT_METHOD(authorize:(NSDictionary *)config : (RCTResponseSenderBlock)cal
 
 -(void) onReq:(BaseReq*)req {
   if ([req isKindOfClass:[SendAuthReq class]]) {
-    NSLog(@"收到req");
+
   }
 }
 
 -(void) onResp:(BaseResp*)resp {
-  NSLog(@"收到resp授权请求");
   if ([resp isKindOfClass:[SendAuthResp class]]) {
     SendAuthResp *authResp = (SendAuthResp *)resp;
-    NSString *code = authResp.code;
-    NSString *country = authResp.country;
-    NSString *lang = authResp.lang;
-    NSString *state = authResp.state;
     
     NSMutableDictionary *results = [[NSMutableDictionary alloc]initWithCapacity:4];
-    if (code) {
-      [results setObject:code forKey:@"code"];
-    }
-    if (country) {
-      [results setObject:country forKey:@"country"];
-    }
-    if (lang) {
-      [results setObject:lang forKey:@"lang"];
-    }
-    if (state) {
-      [results setObject:state forKey:@"state"];
+    
+    if(authResp.errCode == WXSuccess) {
+      NSString *code = authResp.code;
+      NSString *country = authResp.country;
+      NSString *lang = authResp.lang;
+      NSString *state = authResp.state;
+      
+      if(![authState isEqualToString:state]) {
+        [results setObject:@"state not match" forKey:@"error"];
+      } else {
+        if (code) {
+          [results setObject:code forKey:@"code"];
+        }
+        if (country) {
+          [results setObject:country forKey:@"country"];
+        }
+        if (lang) {
+          [results setObject:lang forKey:@"lang"];
+        }
+      }
+    } else if(authResp.errCode == WXErrCodeUserCancel || authResp.errCode == WXErrCodeAuthDeny) {
+      [results setObject: [NSNumber numberWithBool:YES] forKey:@"cancel"];
+    } else {
+      NSString *errMsg = [NSString stringWithFormat:@"errCode=%d", authResp.errCode];
+      [results setObject: errMsg forKey:@"error"];
     }
     
     authCallback(@[results]);
@@ -70,8 +74,15 @@ RCT_EXPORT_METHOD(authorize:(NSDictionary *)config : (RCTResponseSenderBlock)cal
   }
 }
 
-- (void)dealloc {
-  NSLog(@"%@结束了",self.class);
+- (NSString *) randomString {
+  NSString *alphabet  = @"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXZY0123456789";
+  NSMutableString *s = [NSMutableString stringWithCapacity:20];
+  for (NSUInteger i = 0U; i < 20; i++) {
+    u_int32_t r = arc4random() % [alphabet length];
+    unichar c = [alphabet characterAtIndex:r];
+    [s appendFormat:@"%C", c];
+  }
+  return alphabet;
 }
 
 @end

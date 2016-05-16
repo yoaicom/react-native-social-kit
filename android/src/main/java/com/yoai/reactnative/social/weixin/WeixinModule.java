@@ -1,4 +1,4 @@
-package com.yoai.reactnative.socialsdk.weixin;
+package com.yoai.reactnative.social.weixin;
 
 import android.content.Intent;
 import android.util.Log;
@@ -16,7 +16,7 @@ import com.tencent.mm.sdk.modelmsg.SendAuth;
 import com.tencent.mm.sdk.openapi.IWXAPI;
 import com.tencent.mm.sdk.openapi.IWXAPIEventHandler;
 import com.tencent.mm.sdk.openapi.WXAPIFactory;
-import com.yoai.reactnative.socialsdk.Utils;
+import com.yoai.reactnative.social.Utils;
 
 import java.util.UUID;
 

@@ -11,8 +11,10 @@
 # 配置  
 ## iOS
 
-需要使用[Cocoapods](https://cocoapods.org/)来管理依赖。*（诸如微信、QQ等第三方的官方SDK包含了大量依赖文件和Xcode配置，使用Cocoapods可以极大简化这些流程）*
+需要使用[Cocoapods](https://cocoapods.org/)来管理依赖。*（诸如微信、QQ等第三方的官方SDK包含了大量依赖文件和Xcode配置，使用Cocoapods可以极大简化这些流程）*  
+
 在Podfile里添加
+
  ```
  pod "react-native-social-sdk", :path => '../node_modules/react-native-social-kit'
  ```
@@ -113,7 +115,7 @@ public class MainActivity extends ReactActivity {
 
 ##### 微信
 
-在你的包名相应目录下新建一个wxapi目录，并在该wxapi目录下新增一个***WXEntryActivity***类，该类继承自***com.yoai.reactnative.socialsdk.weixin.WXEntryActivity***。
+在你的包名相应目录下新建一个wxapi目录，并在该wxapi目录下新增一个***WXEntryActivity***类，该类继承自***com.yoai.reactnative.social.weixin.WXEntryActivity***。
 
 在AndroidManifest.xml里添加：
 
@@ -202,7 +204,7 @@ Weibo.authorize({
 | ----------- | ---------------------------------------- | ------ | :-----: | :-----: |
 | appId       | 第三方账号的App Key或App ID，必填                  | OK     |   OK    |   OK    |
 | redirectUrl | 微博授权回调页，一般为"https://api.weibo.com/oauth2/default.html"，必填 | OK     |   NA    |   NA    |
-| scope       | 授权的权限范围，可不填                              | NA     | Not Yet | Not Yet |
+| scope       | 授权的权限范围，可不填，默认最低权限                       | NA     | Not Yet | Not Yet |
 
 ###### data
 
@@ -237,6 +239,19 @@ QQ授权结果
 | openId           |       |
 | accessToken      |       |
 | expiresInSeconds |       |
+
+
+
+# 关于我们
+
+成员
+
+- [ldn0x7dc](https://github.com/ldn0x7dc)
+- [yuanyuli](https://github.com/yuanyuli)
+
+组织
+
+- [yoaicom](https://github.com/yoaicom)
 
 
 

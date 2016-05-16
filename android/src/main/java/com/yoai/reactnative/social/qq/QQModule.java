@@ -1,4 +1,4 @@
-package com.yoai.reactnative.socialsdk.qq;
+package com.yoai.reactnative.social.qq;
 
 import android.content.Intent;
 import android.util.Log;
@@ -15,7 +15,7 @@ import com.tencent.connect.common.Constants;
 import com.tencent.tauth.IUiListener;
 import com.tencent.tauth.Tencent;
 import com.tencent.tauth.UiError;
-import com.yoai.reactnative.socialsdk.Utils;
+import com.yoai.reactnative.social.Utils;
 
 import org.json.JSONObject;
 
@@ -69,15 +69,15 @@ public class QQModule extends ReactContextBaseJavaModule implements ActivityEven
           JSONObject jsonObject = (JSONObject) o;
           String openId = jsonObject.optString("openid", null);
           String accessToken = jsonObject.optString("access_token", null);
-          int expiresInSec = jsonObject.optInt("expires_in", 0);
+          int expiresInSeconds = jsonObject.optInt("expires_in", 0);
           if (openId != null) {
             data.putString("openId", openId);
           }
           if (accessToken != null) {
             data.putString("accessToken", accessToken);
           }
-          if (expiresInSec > 0) {
-            data.putInt("expiresInSec", expiresInSec);
+          if (expiresInSeconds > 0) {
+            data.putInt("expiresInSeconds", expiresInSeconds);
           }
         }
         result.invoke(data);

@@ -1,4 +1,4 @@
-package com.yoai.reactnative.socialsdk.weibo;
+package com.yoai.reactnative.social.weibo;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -16,7 +16,7 @@ import com.sina.weibo.sdk.auth.AuthInfo;
 import com.sina.weibo.sdk.auth.WeiboAuthListener;
 import com.sina.weibo.sdk.auth.sso.SsoHandler;
 import com.sina.weibo.sdk.exception.WeiboException;
-import com.yoai.reactnative.socialsdk.Utils;
+import com.yoai.reactnative.social.Utils;
 
 public class WeiboModule extends ReactContextBaseJavaModule implements ActivityEventListener{
 
@@ -45,11 +45,11 @@ public class WeiboModule extends ReactContextBaseJavaModule implements ActivityE
       return;
     }
 
-    if(!config.hasKey("appKey")) {
-      Log.e(TAG, "authorize...missing appKey");
+    if(!config.hasKey("appId")) {
+      Log.e(TAG, "authorize...missing appId");
       return;
     }
-    String appKey = config.getString("appKey");
+    String appId = config.getString("appId");
 
     if(!config.hasKey("redirectUrl")) {
       Log.e(TAG, "authorize...missing redirectUrl");
@@ -64,7 +64,7 @@ public class WeiboModule extends ReactContextBaseJavaModule implements ActivityE
       scope = config.getString("scope");
     }
 
-    AuthInfo authInfo = new AuthInfo(getCurrentActivity(), appKey, redirectUrl, scope);
+    AuthInfo authInfo = new AuthInfo(getCurrentActivity(), appId, redirectUrl, scope);
     this.ssoHandler = new SsoHandler(getCurrentActivity(), authInfo);
     this.ssoHandler.authorize(new WeiboAuthListener() {
       @Override
@@ -82,7 +82,7 @@ public class WeiboModule extends ReactContextBaseJavaModule implements ActivityE
           writableMap.putString("uid", uid);
           writableMap.putString("accessToken", access_token);
           writableMap.putString("refreshToken", refresh_token);
-          writableMap.putString("expiresInSec", expires_in);
+          writableMap.putString("expiresInSeconds", expires_in);
 
           if(result != null) {
             result.invoke(writableMap);

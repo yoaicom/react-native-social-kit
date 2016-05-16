@@ -9,10 +9,10 @@ RCT_EXPORT_MODULE(Weibo);
 
 RCT_EXPORT_METHOD(authorize:(NSDictionary *)config : (RCTResponseSenderBlock)callback) {
   NSLog(@"authorize...");
-  NSString *appKey = [config objectForKey:@"appKey"];
+  NSString *appId = [config objectForKey:@"appId"];
   
   [WeiboSDK enableDebugMode:YES];
-  [WeiboSDK registerApp:appKey];
+  [WeiboSDK registerApp:appId];
   
   authCallback = callback;
   WBAuthorizeRequest *request = [WBAuthorizeRequest request];

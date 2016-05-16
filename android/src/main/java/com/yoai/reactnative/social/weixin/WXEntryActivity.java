@@ -1,4 +1,4 @@
-package com.yoai.reactnative.socialsdk.weixin;
+package com.yoai.reactnative.social.weixin;
 
 import android.app.Activity;
 import android.content.Intent;
