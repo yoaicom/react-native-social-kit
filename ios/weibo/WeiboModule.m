@@ -29,24 +29,34 @@ RCT_EXPORT_METHOD(authorize:(NSDictionary *)config : (RCTResponseSenderBlock)cal
   NSLog(@"didReceiveWeiboResponse...");
   if ([response isKindOfClass:WBAuthorizeResponse.class]) {
     WBAuthorizeResponse *authorizeResponse = (WBAuthorizeResponse *)response;
-    NSString *uid = authorizeResponse.userID;
-    NSString *accessToken = authorizeResponse.accessToken;
-    NSString *refreshToken = authorizeResponse.refreshToken;
-    NSInteger expiresInSeconds = [authorizeResponse.expirationDate timeIntervalSinceNow];
-    NSLog(@"didReceiveWeiboResponse...uid=%@, accessToken=%@, refreshToken=%@, expiresInSeconds=%zd", uid, accessToken, refreshToken, expiresInSeconds);
     
     NSMutableDictionary *results = [NSMutableDictionary dictionaryWithCapacity:4];
-    if(uid) {
-      [results setValue:uid forKey:@"uid"];
-    }
-    if(accessToken) {
-      [results setValue:accessToken forKey:@"accessToken"];
-    }
-    if(refreshToken) {
-      [results setValue:refreshToken forKey:@"refreshToken"];
-    }
-    if(expiresInSeconds > 0) {
-      [results setValue:[NSNumber numberWithInteger: expiresInSeconds] forKey:@"expiresInSeconds"];
+    
+    if(authorizeResponse.statusCode == WeiboSDKResponseStatusCodeSuccess) {
+      
+      NSString *uid = authorizeResponse.userID;
+      NSString *accessToken = authorizeResponse.accessToken;
+      NSString *refreshToken = authorizeResponse.refreshToken;
+      NSInteger expiresInSeconds = [authorizeResponse.expirationDate timeIntervalSinceNow];
+      NSLog(@"didReceiveWeiboResponse...uid=%@, accessToken=%@, refreshToken=%@, expiresInSeconds=%zd", uid, accessToken, refreshToken, expiresInSeconds);
+      
+      if(uid) {
+        [results setValue:uid forKey:@"uid"];
+      }
+      if(accessToken) {
+        [results setValue:accessToken forKey:@"accessToken"];
+      }
+      if(refreshToken) {
+        [results setValue:refreshToken forKey:@"refreshToken"];
+      }
+      if(expiresInSeconds > 0) {
+        [results setValue:[NSNumber numberWithInteger: expiresInSeconds] forKey:@"expiresInSeconds"];
+      }
+    } else if(authorizeResponse.statusCode == WeiboSDKResponseStatusCodeUserCancel) {
+      [results setObject: [NSNumber numberWithBool:YES] forKey:@"cancel"];
+    } else {
+      NSString *errMsg = [NSString stringWithFormat:@"errCode=%d", authorizeResponse.statusCode];
+      [results setObject: errMsg forKey:@"error"];
     }
     
     authCallback(@[results]);

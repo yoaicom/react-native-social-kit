@@ -20,6 +20,25 @@
  ```
 然后执行命令`pod install`。（*是不是很简单！*）
 
+修改AppDelegate.m文件如下：
+
+```objective-c
+#import "WeixinModule.h"
+#import "WeiboModule.h"
+#import "QQModule.h"
+...
+  
+- (BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url
+{
+  return [WeixinModule handleOpenURL:url] || [WeiboModule handleOpenURL:url] || [QQModule handleOpenURL:url];
+}
+
+- (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation
+{
+  return [WeixinModule handleOpenURL:url] || [WeiboModule handleOpenURL:url] || [QQModule handleOpenURL:url];
+}
+```
+
 ##### 微信
 
 在**Xcode**中选中**TARGETS**，在**info**标签栏的**URL Types**项目下添加子项，子项的**URL Schemes**为你所注册的应用程序的AppId。
