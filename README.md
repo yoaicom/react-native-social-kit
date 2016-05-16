@@ -11,12 +11,12 @@
 # 配置  
 ## iOS
 
-需要使用Cocoapods来管理依赖。  
-添加
+需要使用[Cocoapods](https://cocoapods.org/)来管理依赖。*（诸如微信、QQ等第三方的官方SDK包含了大量依赖文件和Xcode配置，使用Cocoapods可以极大简化这些流程）*
+在Podfile里添加
  ```
  pod "react-native-social-sdk", :path => '../node_modules/react-native-social-kit'
  ```
-到Podfile，然后执行命令`pod install`。
+然后执行命令`pod install`。（*是不是很简单！*）
 
 ##### 微信
 
@@ -61,6 +61,8 @@
 
 ## Android
 
+请依次修改以下文件：
+
 ```
 // file: settings.gradle
 ...
@@ -76,6 +78,38 @@ dependencies {
     compile project(':react-native-social-kit')
 }
 ```
+
+```Java
+// file: MainActivity.java
+...
+import com.yoai.reactnative.socialsdk.SocialPackage;
+...
+public class MainActivity extends ReactActivity {
+	...
+	
+    /**
+     * A list of packages used by the app. If the app uses additional views
+     * or modules besides the default ones, add more packages here.
+     */
+    @Override
+    protected List<ReactPackage> getPackages() {
+        return Arrays.<ReactPackage>asList(
+            new MainReactPackage(),
+            new SocialPackage() // Add our package
+        );
+    }
+}
+```
+
+如果需要代码混淆，为了保证第三方SDK的正常使用，需要在proguard配置中加上：
+
+```
+-keep class com.tencent.mm.sdk.** {
+   *;
+}
+```
+
+
 
 ##### 微信
 
@@ -149,6 +183,66 @@ Weibo.authorize({
   }
 });
 ```
+
+
+
+# API
+
+##### XXX.authorize(config, (data) => {
+
+##### })
+
+​	获取用户授权（XXX表示Weixin、Weibo、QQ）
+
+###### config
+
+*"OK"表示有此参数，"NA"表示没有此参数，"Not Yet"表示有此参数但是待实现。*
+
+| key         | value                                    | Weixin |  Weibo  |   QQ    |
+| ----------- | ---------------------------------------- | ------ | :-----: | :-----: |
+| appId       | 第三方账号的App Key或App ID，必填                  | OK     |   OK    |   OK    |
+| redirectUrl | 微博授权回调页，一般为"https://api.weibo.com/oauth2/default.html"，必填 | OK     |   NA    |   NA    |
+| scope       | 授权的权限范围，可不填                              | NA     | Not Yet | Not Yet |
+
+###### data
+
+通用授权结果
+
+| key    | value             | Weixin | Weibo |  QQ  |
+| ------ | ----------------- | :----: | :---: | :--: |
+| error  | 如果存在此字段，表示发生了错误   |   OK   |  OK   |  OK  |
+| cancel | 如果为true，表示用户取消了授权 |   OK   |  OK   |  OK  |
+
+微信授权结果
+
+| key     | value |
+| ------- | ----- |
+| code    |       |
+| country |       |
+| lang    |       |
+
+微博授权结果
+
+| key              | value |
+| ---------------- | :---- |
+| uid              |       |
+| accessToken      |       |
+| refreshToken     |       |
+| expiresInSeconds |       |
+
+QQ授权结果
+
+| key              | value |
+| ---------------- | ----- |
+| openId           |       |
+| accessToken      |       |
+| expiresInSeconds |       |
+
+
+
+
+
+
 
 
 
