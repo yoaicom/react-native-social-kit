@@ -82,7 +82,7 @@ RCT_EXPORT_METHOD(authorize:(NSDictionary *)config : (RCTResponseSenderBlock)cal
     unichar c = [alphabet characterAtIndex:r];
     [s appendFormat:@"%C", c];
   }
-  return alphabet;
+  return s;
 }
 
 @end
