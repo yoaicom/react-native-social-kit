@@ -6,7 +6,7 @@
 **项目仍在开发中，功能不稳定，请耐心等待。**
 
 # 安装
-`npm install react-native-social-kit@latest --save`  
+`npm install --save react-native-social-kit@latest`  
 
 # 配置  
 ## iOS
