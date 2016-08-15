@@ -4,20 +4,17 @@
  * @flow
  */
 
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import {
   AppRegistry,
-  StyleSheet,
-  Text,
-  View
 } from 'react-native';
 
-import Demo from './SocialKitDemo';
+import Demo from './Demo';
 
 class demo extends Component {
   render() {
     return (
-      <Demo />
+      <Demo/>
     );
   }
 }

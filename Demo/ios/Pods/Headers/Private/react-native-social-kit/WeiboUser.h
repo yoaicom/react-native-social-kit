@@ -1,0 +1,1 @@
+../../../../../node_modules/react-native-social-kit/ios/weibo/WeiboSDK/WeiboUser.h

@@ -1,0 +1,1 @@
+../../../../../node_modules/react-native-social-kit/ios/weixin/WeixinSDK/WXApi.h

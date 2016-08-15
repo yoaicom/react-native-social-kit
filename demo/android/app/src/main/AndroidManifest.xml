@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.yoai.reactnative.demo"
+    package="com.demo"
     android:versionCode="1"
     android:versionName="1.0">
 
@@ -11,6 +11,7 @@
         android:targetSdkVersion="22" />
 
     <application
+      android:name=".MainApplication"
       android:allowBackup="true"
       android:label="@string/app_name"
       android:icon="@mipmap/ic_launcher"
@@ -25,25 +26,6 @@
         </intent-filter>
       </activity>
       <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" />
-
-      <activity
-        android:name=".wxapi.WXEntryActivity"
-        android:exported="true"
-        android:label="@string/app_name"
-        android:theme="@android:style/Theme.Translucent.NoTitleBar"
-        />
-      <activity
-        android:name="com.tencent.tauth.AuthActivity"
-        android:launchMode="singleTask"
-        android:noHistory="true">
-        <intent-filter>
-          <action android:name="android.intent.action.VIEW"/>
-          <category android:name="android.intent.category.DEFAULT"/>
-          <category android:name="android.intent.category.BROWSABLE"/>
-
-          <data android:scheme="tencent222222"/>
-        </intent-filter>
-      </activity>
     </application>
 
 </manifest>

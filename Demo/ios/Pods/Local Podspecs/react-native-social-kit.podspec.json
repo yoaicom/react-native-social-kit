@@ -1,0 +1,82 @@
+{
+  "name": "react-native-social-kit",
+  "version": "0.0.7",
+  "platforms": {
+    "ios": "7.0"
+  },
+  "requires_arc": true,
+  "authors": "zt",
+  "license": "MIT",
+  "summary": "social sdk",
+  "homepage": "https://github.com/yoaicom/react-native-social-kit",
+  "source": {
+    "git": "https://github.com/yoaicom/react-native-social-kit.git"
+  },
+  "subspecs": [
+    {
+      "name": "Weixin",
+      "source_files": [
+        "ios/weixin/*.{h,m}",
+        "ios/weixin/WeixinSDK/*.{h,m}"
+      ],
+      "resources": "ios/weixin/WeixinSDK/*.bundle",
+      "vendored_libraries": "ios/weixin/WeixinSDK/*.a",
+      "vendored_frameworks": "ios/weixin/WeixinSDK/*.framework",
+      "frameworks": [
+        "SystemConfiguration",
+        "CoreTelephony"
+      ],
+      "libraries": [
+        "z",
+        "sqlite3",
+        "c++"
+      ]
+    },
+    {
+      "name": "Weibo",
+      "source_files": [
+        "ios/weibo/*.{h,m}",
+        "ios/weibo/WeiboSDK/*.{h,m}"
+      ],
+      "resources": "ios/weibo/WeiboSDk/*.bundle",
+      "vendored_libraries": "ios/weibo/WeiboSDK/*.a",
+      "vendored_frameworks": "ios/weibo/WeiboSDK/*.framework",
+      "frameworks": [
+        "ImageIO",
+        "CoreText",
+        "QuartzCore",
+        "UIKit",
+        "Foundation",
+        "Security",
+        "CoreGraphics",
+        "SystemConfiguration",
+        "CoreTelephony"
+      ],
+      "libraries": [
+        "z",
+        "sqlite3"
+      ]
+    },
+    {
+      "name": "QQ",
+      "source_files": [
+        "ios/qq/*.{h,m}",
+        "ios/qq/QQSDK/*.{h,m}"
+      ],
+      "resources": "ios/qq/QQSDK/*.bundle",
+      "vendored_frameworks": "ios/qq/QQSDK/*.framework",
+      "frameworks": [
+        "Security",
+        "CoreGraphics",
+        "SystemConfiguration",
+        "CoreTelephony"
+      ],
+      "libraries": [
+        "iconv",
+        "stdc++",
+        "z",
+        "sqlite3"
+      ]
+    }
+  ]
+}
