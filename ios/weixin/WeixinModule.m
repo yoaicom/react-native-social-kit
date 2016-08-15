@@ -1,88 +1,331 @@
+//
+//  WeixinModule.m
+//  Demo
+//
+//  Created by 张天 on 16/8/1.
+//  Copyright © 2016年 Facebook. All rights reserved.
+//
+
+#define BUFFER_SIZE 1024 * 100
+
+#import "RCTImageLoader.h"
 #import "WeixinModule.h"
-#import "WXApiObject.h"
 
 static RCTResponseSenderBlock authCallback;
-static NSString* authState;
+static RCTResponseSenderBlock shareCallback;
 
 @implementation WeixinModule
 
+@synthesize bridge = _bridge;
+
 + (BOOL)handleOpenURL:(NSURL *)url {
-  NSLog(@"URL :%@ ",url);
-  
-  WeixinModule *module = [[WeixinModule alloc]init];
+  WeixinModule *module = [[WeixinModule alloc] init];
   return [WXApi handleOpenURL:url delegate:module];
 }
 
 RCT_EXPORT_MODULE(Weixin);
-
-RCT_EXPORT_METHOD(authorize:(NSDictionary *)config : (RCTResponseSenderBlock)callback) {
+//注册App
+RCT_EXPORT_METHOD(registerApp : (NSDictionary *)config : (RCTResponseSenderBlock)callback) {
   NSString *appId = [config objectForKey:@"appId"];
   [WXApi registerApp:appId];
-  
+}
+//判断微信是否登录
+RCT_EXPORT_METHOD(isWXAppInstalled : (RCTResponseSenderBlock)callback) {
+  NSString *result = [NSString stringWithFormat:@"%d", [WXApi isWXAppInstalled]];
+
+  callback(@[result]);
+}
+//判断微信是否支持Api
+RCT_EXPORT_METHOD(isWXAppSupportApi : (RCTResponseSenderBlock)callback) {
+  NSString *result = [NSString stringWithFormat:@"%d", [WXApi isWXAppSupportApi]];
+
+  callback(@[result]);
+}
+//打开微信
+RCT_EXPORT_METHOD(openWXApp : (RCTResponseSenderBlock)callback) {
+  NSString *result = [NSString stringWithFormat:@"%d", [WXApi openWXApp]];
+
+  callback(@[result]);
+}
+//获取微信的iTunes安装地址
+RCT_EXPORT_METHOD(getWXAppInstallUrl : (RCTResponseSenderBlock)callback) {
+  NSString *result = [WXApi getWXAppInstallUrl];
+
+  callback(@[result]);
+}
+//获取Api版本
+RCT_EXPORT_METHOD(getApiVersion : (RCTResponseSenderBlock)callback) {
+  NSString *result = [WXApi getApiVersion];
+
+  callback(@[result]);
+}
+//授权登录
+RCT_EXPORT_METHOD(authorize : (NSDictionary *)config : (RCTResponseSenderBlock)callback) {
+
   authCallback = callback;
-  authState = [self randomString];
-  
-  SendAuthReq* req =[[SendAuthReq alloc] init];
-  req.scope = @"snsapi_userinfo" ;
-  req.state = authState;
-  
+
+  SendAuthReq *req = [[SendAuthReq alloc] init];
+  req.scope = [config objectForKey:@"scope"];
+  req.state = [config objectForKey:@"state"];
   //第三方向微信终端发送一个SendAuthReq消息结构
   [WXApi sendReq:req];
-  
 }
 
--(void) onReq:(BaseReq*)req {
-  if ([req isKindOfClass:[SendAuthReq class]]) {
+//文件
+RCT_EXPORT_METHOD(sendFile : (NSDictionary *)config : (RCTResponseSenderBlock)callback) {
+  shareCallback = callback;
 
+  WXMediaMessage *message = [self getMessageWithConfig:config];
+
+  WXFileObject *fileObject = [WXFileObject object];
+  fileObject.fileExtension = [config objectForKey:@"fileExtension"];
+  fileObject.fileData = [NSData dataWithContentsOfFile:[config objectForKey:@"filePath"]];
+
+  message.mediaObject = fileObject;
+
+  [self getThumbImageWithConfig:config andSendMessage:message];
+}
+
+// gif表情
+RCT_EXPORT_METHOD(sendGif : (NSDictionary *)config : (RCTResponseSenderBlock)callback) {
+  shareCallback = callback;
+
+  WXMediaMessage *message = [self getMessageWithConfig:config];
+
+  WXEmoticonObject *emoObject = [WXEmoticonObject object];
+  emoObject.emoticonData = [NSData dataWithContentsOfFile:[config objectForKey:@"gifPath"]];
+
+  message.mediaObject = emoObject;
+
+  [self getThumbImageWithConfig:config andSendMessage:message];
+}
+
+//图片表情
+RCT_EXPORT_METHOD(sendNonGif : (NSDictionary *)config : (RCTResponseSenderBlock)callback) {
+  shareCallback = callback;
+
+  WXMediaMessage *message = [self getMessageWithConfig:config];
+
+  WXEmoticonObject *emoObject = [WXEmoticonObject object];
+
+  emoObject.emoticonData = [NSData dataWithContentsOfFile:[config objectForKey:@"nonGifPath"]];
+
+  message.mediaObject = emoObject;
+
+  [self getThumbImageWithConfig:config andSendMessage:message];
+}
+
+// App
+RCT_EXPORT_METHOD(sendApp : (NSDictionary *)config : (RCTResponseSenderBlock)callback) {
+  shareCallback = callback;
+
+  WXMediaMessage *message = [self getMessageWithConfig:config];
+
+  WXAppExtendObject *appObject = [WXAppExtendObject object];
+  appObject.extInfo = [config objectForKey:@"extInfo"];
+  appObject.url = [config objectForKey:@"url"];
+
+  Byte *pBuffer = (Byte *)malloc(BUFFER_SIZE);
+  memset(pBuffer, 0, BUFFER_SIZE);
+  NSData *data = [NSData dataWithBytes:pBuffer length:BUFFER_SIZE];
+  free(pBuffer);
+
+  appObject.fileData = data;
+
+  message.mediaObject = appObject;
+
+  [self getThumbImageWithConfig:config andSendMessage:message];
+}
+
+//视频
+RCT_EXPORT_METHOD(sendVideo : (NSDictionary *)config : (RCTResponseSenderBlock)callback) {
+  shareCallback = callback;
+
+  WXMediaMessage *message = [self getMessageWithConfig:config];
+
+  WXVideoObject *videoObject = [WXVideoObject object];
+  videoObject.videoUrl = [config objectForKey:@"videoUrl"];
+  videoObject.videoLowBandUrl = [config objectForKey:@"videoLowBandUrl"];
+
+  message.mediaObject = videoObject;
+
+  [self getThumbImageWithConfig:config andSendMessage:message];
+}
+
+//音乐
+RCT_EXPORT_METHOD(sendMusic : (NSDictionary *)config : (RCTResponseSenderBlock)callback) {
+  shareCallback = callback;
+
+  WXMediaMessage *message = [self getMessageWithConfig:config];
+
+  WXMusicObject *musicObject = [WXMusicObject object];
+  musicObject.musicUrl = [config objectForKey:@"musicUrl"];
+  musicObject.musicDataUrl = [config objectForKey:@"musicDataUrl"];
+  musicObject.musicLowBandUrl = [config objectForKey:@"musicLowBandUrl"];
+  musicObject.musicLowBandDataUrl = [config objectForKey:@"musicLowBandDataUrl"];
+
+  message.mediaObject = musicObject;
+
+  [self getThumbImageWithConfig:config andSendMessage:message];
+}
+
+//网页link
+RCT_EXPORT_METHOD(sendWeb : (NSDictionary *)config : (RCTResponseSenderBlock)callback) {
+
+  shareCallback = callback;
+  WXMediaMessage *message = [self getMessageWithConfig:config];
+
+  WXWebpageObject *webpageObject = [WXWebpageObject object];
+  webpageObject.webpageUrl = [config objectForKey:@"webpageUrl"];
+
+  message.mediaObject = webpageObject;
+
+  [self getThumbImageWithConfig:config andSendMessage:message];
+}
+
+// 2纯图片
+RCT_EXPORT_METHOD(sendImage : (NSDictionary *)config : (RCTResponseSenderBlock)callback) {
+
+  shareCallback = callback;
+
+  WXMediaMessage *message = [self getMessageWithConfig:config];
+
+  WXImageObject *imageObject = [WXImageObject object];
+  imageObject.imageData = [NSData dataWithContentsOfFile:[config objectForKey:@"imagePath"]];
+
+  message.mediaObject = imageObject;
+
+  [self getThumbImageWithConfig:config andSendMessage:message];
+}
+
+// 1纯文本
+RCT_EXPORT_METHOD(sendText : (NSDictionary *)config : (RCTResponseSenderBlock)callback) {
+  shareCallback = callback;
+
+  //分享方式选择(对话,朋友圈,收藏)
+  int scene = [self judgeSceneTypeWithConfig:config];
+
+  SendMessageToWXReq *req = [[SendMessageToWXReq alloc] init];
+  req.text = [config objectForKey:@"text"];
+  req.bText = YES;
+  req.scene = scene;
+  [WXApi sendReq:req];
+}
+
+- (WXMediaMessage *)getMessageWithConfig:(NSDictionary *)config {
+  WXMediaMessage *message = [WXMediaMessage message];
+  message.title = [config objectForKey:@"title"];
+  message.description = [config objectForKey:@"description"];
+  return message;
+}
+
+- (void)getThumbImageWithConfig:(NSDictionary *)config andSendMessage:(WXMediaMessage *)message {
+  NSString *thumbImage = [config objectForKey:@"thumbImage"];
+  __weak typeof(self) weakSelf = self;
+  if (thumbImage.length && _bridge.imageLoader) {
+    NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:thumbImage]];
+    [_bridge.imageLoader loadImageWithURLRequest:request
+                                            size:CGSizeMake(100, 100)
+                                           scale:1
+                                         clipped:FALSE
+                                      resizeMode:RCTResizeModeStretch
+                                   progressBlock:nil
+                                 completionBlock:^(NSError *error, UIImage *image) {
+                                   [message setThumbImage:image];
+                                   [weakSelf sendReqWithMessage:message config:config];
+                                 }];
+  } else {
+    [message setThumbImage:nil];
+    [weakSelf sendReqWithMessage:message config:config];
   }
 }
 
--(void) onResp:(BaseResp*)resp {
+- (void)sendReqWithMessage:(WXMediaMessage *)message config:(NSDictionary *)config {
+
+  int scene = [self judgeSceneTypeWithConfig:config];
+
+  SendMessageToWXReq *req = [[SendMessageToWXReq alloc] init];
+  req.bText = NO;
+  req.message = message;
+  req.scene = scene;
+
+  [WXApi sendReq:req];
+}
+
+- (int)judgeSceneTypeWithConfig:(NSDictionary *)config {
+
+  NSString *sceneName = [config objectForKey:@"scene"];
+
+  if ([sceneName isEqualToString:@"WXSceneTimeline"]) {
+    return 1;
+  } else if ([sceneName isEqualToString:@"WXSceneFavorite"]) {
+    return 2;
+  } else
+    return 0;
+}
+
+- (void)onReq:(BaseReq *)req {
+  NSLog(@"收到req");
+}
+
+- (void)onResp:(BaseResp *)resp {
   if ([resp isKindOfClass:[SendAuthResp class]]) {
     SendAuthResp *authResp = (SendAuthResp *)resp;
-    
-    NSMutableDictionary *results = [[NSMutableDictionary alloc]initWithCapacity:4];
-    
-    if(authResp.errCode == WXSuccess) {
-      NSString *code = authResp.code;
-      NSString *country = authResp.country;
-      NSString *lang = authResp.lang;
-      NSString *state = authResp.state;
-      
-      if(![authState isEqualToString:state]) {
-        [results setObject:@"state not match" forKey:@"error"];
-      } else {
-        if (code) {
-          [results setObject:code forKey:@"code"];
-        }
-        if (country) {
-          [results setObject:country forKey:@"country"];
-        }
-        if (lang) {
-          [results setObject:lang forKey:@"lang"];
-        }
-      }
-    } else if(authResp.errCode == WXErrCodeUserCancel || authResp.errCode == WXErrCodeAuthDeny) {
-      [results setObject: [NSNumber numberWithBool:YES] forKey:@"cancel"];
-    } else {
-      NSString *errMsg = [NSString stringWithFormat:@"errCode=%d", authResp.errCode];
-      [results setObject: errMsg forKey:@"error"];
+    NSString *code = authResp.code;
+    NSString *country = authResp.country;
+    NSString *lang = authResp.lang;
+    NSString *state = authResp.state;
+
+    NSMutableDictionary *results = [[NSMutableDictionary alloc] initWithCapacity:4];
+    if (code) {
+      [results setObject:code forKey:@"code"];
     }
-    
+    if (country) {
+      [results setObject:country forKey:@"country"];
+    }
+    if (lang) {
+      [results setObject:lang forKey:@"lang"];
+    }
+    if (state) {
+      [results setObject:state forKey:@"state"];
+    }
+
     authCallback(@[results]);
     authCallback = nil;
   }
+
+  if ([resp isKindOfClass:[SendMessageToWXResp class]]) {
+    SendMessageToWXResp *messageResp = (SendMessageToWXResp *)resp;
+    NSString *errCode = [NSString stringWithFormat:@"%d", messageResp.errCode];
+    NSString *errStr = messageResp.errStr;
+    NSString *type = [NSString stringWithFormat:@"%d", messageResp.type];
+    NSString *lang = messageResp.lang;
+    NSString *country = messageResp.country;
+
+    NSMutableDictionary *results = [[NSMutableDictionary alloc] initWithCapacity:5];
+    if (errCode) {
+      [results setObject:errCode forKey:@"errCode"];
+    }
+    if (errStr) {
+      [results setObject:errStr forKey:@"errStr"];
+    }
+    if (type) {
+      [results setObject:type forKey:@"type"];
+    }
+    if (lang) {
+      [results setObject:lang forKey:@"lang"];
+    }
+    if (country) {
+      [results setObject:country forKey:@"country"];
+    }
+
+    shareCallback(@[results]);
+    shareCallback = nil;
+  }
 }
 
-- (NSString *) randomString {
-  NSString *alphabet  = @"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXZY0123456789";
-  NSMutableString *s = [NSMutableString stringWithCapacity:20];
-  for (NSUInteger i = 0U; i < 20; i++) {
-    u_int32_t r = arc4random() % [alphabet length];
-    unichar c = [alphabet characterAtIndex:r];
-    [s appendFormat:@"%C", c];
-  }
-  return s;
+- (void)dealloc {
+  NSLog(@"%@结束了", self.class);
 }
 
 @end
