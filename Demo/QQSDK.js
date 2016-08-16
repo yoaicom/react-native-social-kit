@@ -1,9 +1,23 @@
 import React, {Component} from 'react';
-import {View, ListView, Text, StyleSheet, TouchableHighlight, TouchableOpacity, ScrollView} from 'react-native';
+import {
+  View,
+  ListView,
+  Text,
+  StyleSheet,
+  TouchableHighlight,
+  TouchableOpacity,
+  ScrollView,
+  Dimensions
+} from 'react-native';
 
 import sdk from 'react-native-social-kit';
-
 let resolveAssetSource = require('resolveAssetSource');
+
+import styles from './Style';
+
+let WINDOW_WIDTH = Dimensions.get('window').width;
+let WINDOW_HEIGHT = Dimensions.get('window').height;
+
 let QQ = sdk.QQ;
 
 let path = require('./jpg/res2.jpg');
@@ -121,7 +135,7 @@ let DataArr = {
   }
 };
 
-export default class WeixinSDK extends Component {
+export default class QQSDK extends Component {
 
   constructor(props) {
     super(props);
@@ -133,7 +147,6 @@ export default class WeixinSDK extends Component {
       apiResult: '---------' || {}
     }
   }
-
 
   componentWillMount() {
     // 注册App
@@ -170,12 +183,25 @@ export default class WeixinSDK extends Component {
     });
 
     return (
-      <ListView
-        style={{marginTop:20}}
-        dataSource={dataSource.cloneWithRowsAndSections(DataArr,sectionIDs,rowIDs)}
-        renderRow={this.renderRow.bind(this)}
-        renderSectionHeader={this.renderSectionHeader.bind(this)}
-      />
+      <ScrollView
+        style = {styles.container}
+      >
+        <View style={styles.navigator}>
+          <Text
+            style= {{position : 'absolute',alignSelf : 'center',left: 5,top: 10,fontSize : 20,fontWeight: 'bold',color:'green'}}
+            onPress = {this.pop.bind(this)}
+          >{'<首页'}</Text>
+          <Text
+            style = {{alignSelf : 'center',fontSize : 25,fontWeight: 'bold',color:'black'}}
+          >{this.props.title?this.props.title:'微信'}</Text>
+        </View>
+        <ListView
+          dataSource={dataSource.cloneWithRowsAndSections(DataArr,sectionIDs,rowIDs)}
+          renderRow={this.renderRow.bind(this)}
+          renderSectionHeader={this.renderSectionHeader.bind(this)}
+
+        />
+      </ScrollView>
     )
   }
 
@@ -192,6 +218,13 @@ export default class WeixinSDK extends Component {
       this.apiHandler(rowData.api);
     } else {
       this.shareMessage();
+    }
+  }
+
+  pop() {
+    const {navigator} = this.props;
+    if (navigator) {
+      navigator.pop();
     }
   }
 
@@ -460,57 +493,3 @@ export default class WeixinSDK extends Component {
   }
 
 }
-
-var styles = StyleSheet.create({
-  rowContent: {
-    justifyContent: 'center',
-    flexDirection: 'row',
-    flexWrap: 'wrap'
-  },
-  row: {
-    justifyContent: 'center',
-    padding: 5,
-    margin: 3,
-    width: 100,
-    height: 55,
-    backgroundColor: '#F6F6F6',
-    alignItems: 'center',
-    borderWidth: 1,
-    // borderRadius: 5,
-  },
-  resultRow: {
-    justifyContent: 'center',
-    padding: 5,
-    margin: 3,
-    backgroundColor: '#F6F6F6',
-    alignItems: 'center',
-    borderWidth: 1,
-    width: 310,
-    height: 150,
-  },
-  sectionHeaderFont: {
-    fontSize: 20,
-    textAlign: 'center'
-  },
-  sectionHeader: {
-    height: 30,
-    justifyContent: 'center',
-    backgroundColor: 'green'
-  },
-  thumb: {
-    width: 64,
-    height: 64
-  },
-  text: {
-    fontSize: 20,
-    alignSelf: 'center',
-    marginTop: 5,
-    fontWeight: 'bold'
-  },
-  resultText: {
-    fontSize: 20,
-    alignSelf: 'center',
-    marginTop: 5,
-    fontWeight: 'bold'
-  },
-});
