@@ -4,10 +4,17 @@ import {View, ListView, Text, StyleSheet, TouchableHighlight, TouchableOpacity, 
 import sdk from 'react-native-social-kit';
 
 let resolveAssetSource = require('resolveAssetSource');
-let Weixin = sdk.Weixin;
+let QQ = sdk.QQ;
 
 let path = require('./jpg/res2.jpg');
 let thumbImage = "file://" + resolveAssetSource(path).uri;
+let thumbnail = resolveAssetSource(path).uri;
+
+let imageUrl = resolveAssetSource(require('./jpg/tampon0.jpg')).uri;
+let imageUrl1 = resolveAssetSource(require('./jpg/tampon1.jpg')).uri;
+let imageUrl2 = resolveAssetSource(require('./jpg/tampon2.jpg')).uri;
+let imageUrl3 = resolveAssetSource(require('./jpg/tampon3.jpg')).uri;
+let imageUrl4 = resolveAssetSource(require('./jpg/tampon3.jpg')).uri;
 
 let DataArr = {
   '分享方式': {
@@ -16,15 +23,15 @@ let DataArr = {
       {
         type1: {
           title: '好友',
-          scene: 'WXSceneSession'
+          scene: 'QQ'
         },
         type2: {
-          title: '朋友圈',
-          scene: 'WXSceneTimeline'
+          title: 'QZone',
+          scene: 'Qzone'
         },
         type3: {
-          title: '收藏',
-          scene: 'WXSceneFavorite'
+          title: '群部落',
+          scene: 'QQGroup'
         },
       }
     ]
@@ -42,33 +49,22 @@ let DataArr = {
           messageType: 'image'
         },
         type3: {
+          title: '多图',
+          messageType: 'imageArray'
+        },
+        type4: {
           title: '链接',
           messageType: 'webLink'
         },
-        type4: {
+        type5: {
           title: '音乐',
           messageType: 'music'
         },
-        type5: {
+        type6: {
           title: '视频',
           messageType: 'video'
         },
-        type6: {
-          title: 'App',
-          messageType: 'app'
-        },
-        type7: {
-          title: '图片表情',
-          messageType: 'nonGif'
-        },
-        type8: {
-          title: 'Gif表情',
-          messageType: 'gif'
-        },
-        type9: {
-          title: '文件',
-          messageType: 'file'
-        },
+
       }
     ]
   },
@@ -88,34 +84,41 @@ let DataArr = {
     rowData: [
       {
         type1: {
-          title: '是否安装微信?',
-          api: 'isWXAppInstalled'
+          title: '是否安装QQ?',
+          api: 'iphoneQQInstalled'
         },
         type2: {
-          title: '是否支持Api?',
-          api: 'isWXAppSupportApi'
+          title: 'SSO登录QQ?',
+          api: 'iphoneQQSupportSSOLogin'
         },
         type3: {
-          title: 'ITunes地址',
-          api: 'getWXAppInstallUrl'
+          title: '是否安装Qzone?',
+          api: 'iphoneQZoneInstalled'
         },
         type4: {
-          title: 'Api版本',
-          api: 'getApiVersion'
+          title: 'SSO登录Qzone?',
+          api: 'iphoneQZoneSupportSSOLogin'
         },
         type5: {
-          title: '打开微信',
-          api: 'openWXApp'
+          title: 'SDK大版本号',
+          api: 'sdkSubVersion'
         },
         type6: {
+          title: 'SDK小版本号',
+          api: 'sdkVersion'
+        },
+        type7: {
+          title: 'QQ版本号',
+          api: 'iphoneQQVersion'
+        },
+        type8: {
           title: '授权登陆',
           api: 'authorize'
         },
+
       }
     ]
-  },
-
-
+  }
 };
 
 export default class WeixinSDK extends Component {
@@ -123,9 +126,9 @@ export default class WeixinSDK extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      scene: 'WXSceneSession',
+      scene: 'QQ',
       messageType: 'text',
-      api: 'isWXAppInstalled',
+      api: 'iphoneQQInstalled',
       shareResult: '--------',
       apiResult: '---------' || {}
     }
@@ -134,8 +137,8 @@ export default class WeixinSDK extends Component {
 
   componentWillMount() {
     // 注册App
-    Weixin.registerApp({
-      appId: "wx1dd0b08688eecaef"
+    QQ.registerApp({
+      appId: "222222"
     }, (data) => {
     });
   }
@@ -195,7 +198,6 @@ export default class WeixinSDK extends Component {
   // 渲染cell
   renderRow(rowData, sectionID:number, rowID:number) {
     let rowdataIDs = Object.keys(rowData);
-    // let borderColor = 'red';
     let content = rowdataIDs.map((id) => {
       let selectedStyle = this.getSelectedStyle(rowData[id]);
       return (
@@ -256,10 +258,10 @@ export default class WeixinSDK extends Component {
       )
     } else if (sectionID == '分享') {
       return (
-          <View style={styles.resultRow}>
-            <Text style={styles.text}>分享返回结果</Text>
-            <Text style={styles.text}>{this.state.shareResult}</Text>
-          </View>
+        <View style={styles.resultRow}>
+          <Text style={styles.text}>分享返回结果</Text>
+          <Text style={styles.text}>{this.state.shareResult}</Text>
+        </View>
 
       )
     } else {
@@ -272,208 +274,189 @@ export default class WeixinSDK extends Component {
 
   shareMessage() {
     if (this.state.messageType == 'text') {
-      this.shareTextToWXReq(this.state.scene);
+      console.log(this.state.scene);
+      this.shareTextToQQ(this.state.scene);
     } else if (this.state.messageType == 'image') {
-      this.shareImageToWXReq(this.state.scene);
+      this.shareImageToQQ(this.state.scene);
+    } else if (this.state.messageType == 'imageArray') {
+      this.shareImageArrayToQQ(this.state.scene);
     } else if (this.state.messageType == 'webLink') {
-      this.shareWebToWXReq(this.state.scene);
+      this.shareWebPageToQQ(this.state.scene);
     } else if (this.state.messageType == 'music') {
-      this.shareMusicToWXReq(this.state.scene);
+      this.shareMusicToQQ(this.state.scene);
     } else if (this.state.messageType == 'video') {
-      this.shareVideoToWXReq(this.state.scene);
-    } else if (this.state.messageType == 'app') {
-      this.shareAppToWXReq(this.state.scene);
-    } else if (this.state.messageType == 'nonGif') {
-      this.shareNonGifToWXReq(this.state.scene);
-    } else if (this.state.messageType == 'gif') {
-      this.shareGifToWXReq(this.state.scene);
-    } else if (this.state.messageType == 'file') {
-      this.shareFileToWXReq(this.state.scene);
+      this.shareVideoToQQ(this.state.scene);
     }
   }
 
-  shareTextToWXReq(scene) {
-    Weixin.shareText({
-      text: "你好这里是有爱官网",
-      scene: scene,
+  shareTextToQQ(scene) {
+    QQ.shareText({
+      text: "这里是一个QQ文本分享的文本",
+      scene: scene
     }, (data) => {
       this.setState({shareResult: JSON.stringify(data)})
     });
   }
 
-  shareImageToWXReq(scene) {
-    Weixin.shareImage({
-      text: "你好这里是有爱官网",
+  shareImageToQQ(scene) {
+    QQ.shareImage({
+      title: "QQ图片分享",
+      description: "这里是一个QQ图片分享的文本",
       scene: scene,
       imagePath: resolveAssetSource(require('./jpg/tampon0.jpg')).uri,
-      thumbImage: thumbImage
-    }, (data) => {
-      this.setState({shareResult: JSON.stringify(shareResult)})
-    });
-  }
-
-  shareWebToWXReq(scene) {
-    Weixin.shareWeb({
-      title: "网页分享",
-      description: "这是一个网页分享",
-      scene: scene,
-      webpageUrl: "http://www.yoai.com/",
-      thumbImage: thumbImage
+      previewImagePath: thumbnail,
     }, (data) => {
       this.setState({shareResult: JSON.stringify(data)})
     });
   }
 
-  shareMusicToWXReq(scene) {
-    Weixin.shareMusic({
-      title: "音乐分享",
-      description: "这是一个音乐分享",
-      musicUrl: "http://y.qq.com/#type=song&id=103347",
-      musicDataUrl: "http://stream20.qqmusic.qq.com/32464723.mp3",
+  shareImageArrayToQQ(scene) {
+    QQ.shareImageArray({
+      title: "QQ多图分享",
+      description: "这里是一个QQ多图分享的文本",
       scene: scene,
-      thumbImage: thumbImage
+      previewImagePath: thumbnail,
+      imageArray: [imageUrl, imageUrl1, imageUrl2, imageUrl3, imageUrl4],
+      previewImageURL: thumbImage,
+      url: "http://a.hiphotos.baidu.com/zhidao/pic/item/ac6eddc451da81cb91b89bd25666d01609243156.jpg",
     }, (data) => {
       this.setState({shareResult: JSON.stringify(data)})
     });
   }
 
-  shareVideoToWXReq(scene) {
-
-    Weixin.shareVideo({
-      title: "视频分享",
-      description: "这是一个视频分享",
-      videoUrl: "http://v.youku.com/v_show/id_XNTUxNDY1NDY4.html",
+  shareWebPageToQQ(scene) {
+    QQ.shareWebPage({
+      title: "QQ网页分享",
+      description: "这是一个QQ网页分享的示例",
+      url: "http://sina.cn?a=1",
+      previewImageURL: thumbImage,
+      // previewImageURL: "http://a.hiphotos.baidu.com/zhidao/pic/item/ac6eddc451da81cb91b89bd25666d01609243156.jpg",
       scene: scene,
-      thumbImage: thumbImage
     }, (data) => {
       this.setState({shareResult: JSON.stringify(data)})
     });
   }
 
-  shareAppToWXReq(scene) {
-
-    Weixin.shareApp({
-      title: "App分享",
-      description: "这是一个App分享",
-      extInfo: "<xml>extend info</xml>",
-      url: "http://weixin.qq.com",
+  shareMusicToQQ(scene) {
+    QQ.shareMusic({
+      title: "QQ音乐分享",
+      description: "这是一个QQ音乐分享的示例",
+      url: "http://y.qq.com/#type=song&id=103347",
+      previewImageURL: thumbImage,
+      // previewImageURL: "http://a.hiphotos.baidu.com/zhidao/pic/item/ac6eddc451da81cb91b89bd25666d01609243156.jpg",
+      flashURL: "http://player.video.qiyi.com/0bb2ae16923822161de984728ac5c415/0/0/v_19rrmdkfh4.swf-albumId=517678900-tvId=517678900-isPurchase=0-cnId=6",
       scene: scene,
-      thumbImage: thumbImage
     }, (data) => {
       this.setState({shareResult: JSON.stringify(data)})
     });
   }
 
-  shareNonGifToWXReq(scene) {
-
-    Weixin.shareNonGif({
-      title: "图片表情分享",
-      description: "这是一个图片表情分享",
+  shareVideoToQQ(scene) {
+    QQ.shareVideo({
+      title: "QQ视频分享",
+      description: "这是一个QQ视频分享的示例",
+      url: "http://y.qq.com/#type=song&id=103347",
+      previewImageURL: thumbImage,
+      // previewImageURL: "http://a.hiphotos.baidu.com/zhidao/pic/item/ac6eddc451da81cb91b89bd25666d01609243156.jpg",
+      flashURL: "http://player.video.qiyi.com/0bb2ae16923822161de984728ac5c415/0/0/v_19rrmdkfh4.swf-albumId=517678900-tvId=517678900-isPurchase=0-cnId=6",
       scene: scene,
-      thumbImage: thumbImage,
-      nonGifPath: resolveAssetSource(require('./jpg/res7.jpg')).uri
     }, (data) => {
       this.setState({shareResult: JSON.stringify(data)})
     });
   }
 
-  shareGifToWXReq(scene) {
-
-    Weixin.shareGif({
-      title: "gif表情分享",
-      description: "这是一个gif表情分享",
-      scene: scene,
-      thumbImage: thumbImage,
-      gifPath: resolveAssetSource(require('./jpg/res6.gif')).uri,
-    }, (data) => {
-      this.setState({shareResult: JSON.stringify(data)})
-    });
-  }
-
-  shareFileToWXReq(scene) {
-
-    Weixin.shareFile({
-      title: "文件分享",
-      description: "这是一个文件分享",
-      scene: scene,
-      thumbImage: thumbImage,
-      filePath: resolveAssetSource(require('./jpg/ML.pdf')).uri,
-    }, (data) => {
-      this.setState({shareResult: JSON.stringify(data)})
-    });
-  }
 
   //Api方法
   apiHandler(apiName) {
-    if (apiName === "isWXAppInstalled") {
-      this.isWXAppInstalled();
-    } else if (apiName === "isWXAppSupportApi") {
-      this.isWXAppSupportApi();
-    } else if (apiName === "getWXAppInstallUrl") {
-      this.getWXAppInstallUrl();
-    } else if (apiName === "getApiVersion") {
-      this.getApiVersion();
-    } else if (apiName === "openWXApp") {
-      this.openWXApp();
+    if (apiName === "iphoneQQInstalled") {
+      this.iphoneQQInstalled();
+    } else if (apiName === "iphoneQQSupportSSOLogin") {
+      this.iphoneQQSupportSSOLogin();
+    } else if (apiName === "iphoneQZoneInstalled") {
+      this.iphoneQZoneInstalled();
+    } else if (apiName === "iphoneQZoneSupportSSOLogin") {
+      this.iphoneQZoneSupportSSOLogin();
+    } else if (apiName === "sdkVersion") {
+      this.sdkVersion();
+    } else if (apiName === "sdkSubVersion") {
+      this.sdkSubVersion();
+    } else if (apiName === "iphoneQQVersion") {
+      this.iphoneQQVersion();
     } else if (apiName === "authorize") {
       this.auth();
     }
   }
 
-  isWXAppInstalled() {
-    Weixin.isWXAppInstalled((data) => {
-      console.log("Api返回结果 : " + data);
+  iphoneQQInstalled() {
+    QQ.iphoneQQInstalled((data) => {
+      console.log("iphoneQQInstalled = " + data);
       this.setState({
         apiResult: data
       })
-    });
+    })
   }
 
-  isWXAppSupportApi() {
-    Weixin.isWXAppSupportApi((data) => {
-      console.log("Api返回结果 : " + data);
+  iphoneQQSupportSSOLogin() {
+    QQ.iphoneQQSupportSSOLogin((data) => {
+      console.log("iphoneQQSupportSSOLogin = " + data);
       this.setState({
         apiResult: data
       })
-    });
+    })
   }
 
-  getWXAppInstallUrl() {
-    Weixin.getWXAppInstallUrl((data) => {
-      console.log("Api返回结果 : " + data);
+  iphoneQZoneInstalled() {
+    QQ.iphoneQZoneInstalled((data) => {
+      console.log("iphoneQZoneInstalled = " + data);
       this.setState({
         apiResult: data
       })
-    });
+    })
   }
 
-  getApiVersion() {
-    Weixin.getApiVersion((data) => {
-      console.log("Api返回结果 : " + data);
+  iphoneQZoneSupportSSOLogin() {
+    QQ.iphoneQZoneSupportSSOLogin((data) => {
+      console.log("iphoneQZoneSupportSSOLogin = " + data);
       this.setState({
         apiResult: data
       })
-    });
+    })
   }
 
-  openWXApp() {
-    Weixin.openWXApp((data) => {
-      console.log("Api返回结果 : " + data);
+  sdkVersion() {
+    QQ.sdkVersion((data) => {
+      console.log("sdkVersion = " + data);
       this.setState({
         apiResult: data
       })
-    });
+    })
+  }
+
+  sdkSubVersion() {
+    QQ.sdkSubVersion((data) => {
+      console.log("sdkSubVersion = " + data);
+      this.setState({
+        apiResult: data
+      })
+    })
+  }
+
+  iphoneQQVersion() {
+    QQ.iphoneQQVersion((data) => {
+      console.log("iphoneQQVersion = " + data);
+      this.setState({
+        apiResult: data
+      })
+    })
   }
 
   auth() {
-    Weixin.authorize(
-      {scope: "snsapi_userinfo", state: "123"},
-      (data) => {
-        console.log("Api返回结果 : " + data);
-        this.setState({
-          apiResult: data
-        })
-      });
+    QQ.authorize(
+      {permissions: []},
+      (data)=> {
+        this.setState({apiResult: data})
+      }
+    )
   }
 
 }
@@ -495,15 +478,15 @@ var styles = StyleSheet.create({
     borderWidth: 1,
     // borderRadius: 5,
   },
-  resultRow:{
+  resultRow: {
     justifyContent: 'center',
     padding: 5,
     margin: 3,
     backgroundColor: '#F6F6F6',
     alignItems: 'center',
     borderWidth: 1,
-    width:310,
-    height:150,
+    width: 310,
+    height: 150,
   },
   sectionHeaderFont: {
     fontSize: 20,
