@@ -124,6 +124,10 @@ let DataArr = {
           title: '授权登陆',
           api: 'authorize'
         },
+        type7: {
+          title: '支付',
+          api: 'pay'
+        },
       }
     ]
   },
@@ -203,14 +207,11 @@ export default class WeixinSDK extends Component {
   }
 
   _onPressHandle(rowData) {
-    console.log(rowData);
     if (rowData.scene && rowData.scene.length > 0) {
       this.setState({scene: rowData.scene})
     } else if (rowData.messageType && rowData.messageType.length > 0) {
-      console.log("rowData.messageType" + rowData.messageType);
-      this.setState({messageType: rowData.messageType})
+      this.setState({messageType: rowData.messageType}) 
     } else if (rowData.api && rowData.api.length > 0) {
-      console.log("rowData.api" + rowData.api);
       this.setState({api: rowData.api})
       this.apiHandler(rowData.api);
     } else {
@@ -245,7 +246,6 @@ export default class WeixinSDK extends Component {
         </TouchableOpacity>
       )
     });
-    console.log('sectionID = ' + sectionID);
     let resultComponent = this.getResultComponent(rowData, sectionID);
     return (
       <View
@@ -450,12 +450,13 @@ export default class WeixinSDK extends Component {
       this.openWXApp();
     } else if (apiName === "authorize") {
       this.auth();
+    }else if (apiName === "pay") {
+      this.pay();
     }
   }
 
   isWXAppInstalled() {
     Weixin.isWXAppInstalled((data) => {
-      console.log("Api返回结果 : " + data);
       this.setState({
         apiResult: data
       })
@@ -464,7 +465,6 @@ export default class WeixinSDK extends Component {
 
   isWXAppSupportApi() {
     Weixin.isWXAppSupportApi((data) => {
-      console.log("Api返回结果 : " + data);
       this.setState({
         apiResult: data
       })
@@ -473,7 +473,6 @@ export default class WeixinSDK extends Component {
 
   getWXAppInstallUrl() {
     Weixin.getWXAppInstallUrl((data) => {
-      console.log("Api返回结果 : " + data);
       this.setState({
         apiResult: data
       })
@@ -482,7 +481,6 @@ export default class WeixinSDK extends Component {
 
   getApiVersion() {
     Weixin.getApiVersion((data) => {
-      console.log("Api返回结果 : " + data);
       this.setState({
         apiResult: data
       })
@@ -491,7 +489,6 @@ export default class WeixinSDK extends Component {
 
   openWXApp() {
     Weixin.openWXApp((data) => {
-      console.log("Api返回结果 : " + data);
       this.setState({
         apiResult: data
       })
@@ -502,11 +499,22 @@ export default class WeixinSDK extends Component {
     Weixin.authorize(
       {scope: "snsapi_userinfo", state: "123"},
       (data) => {
-        console.log("Api返回结果 : " + data);
         this.setState({
           apiResult: data
         })
       });
+  }
+
+  pay() {
+    Weixin.pay(
+      {url:"http://wxpay.weixin.qq.com/pub_v2/app/app_pay.php?plat=ios"},
+      (data) =>{
+        console.log(JSON.stringify(data));
+        this.setState({
+          apiResult: data
+        })
+      }
+    )
   }
 
 }

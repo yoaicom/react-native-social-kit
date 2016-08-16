@@ -206,11 +206,9 @@ export default class QQSDK extends Component {
   }
 
   _onPressHandle(rowData) {
-    console.log(rowData);
     if (rowData.scene && rowData.scene.length > 0) {
       this.setState({scene: rowData.scene})
     } else if (rowData.messageType && rowData.messageType.length > 0) {
-      console.log("rowData.messageType" + rowData.messageType);
       this.setState({messageType: rowData.messageType})
     } else if (rowData.api && rowData.api.length > 0) {
       console.log("rowData.api" + rowData.api);

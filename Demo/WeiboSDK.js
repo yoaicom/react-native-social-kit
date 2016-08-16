@@ -172,12 +172,9 @@ export default class WeiboSDK extends Component {
   }
 
   _onPressHandle(rowData) {
-    console.log(rowData);
     if (rowData.messageType && rowData.messageType.length > 0) {
-      console.log("rowData.messageType" + rowData.messageType);
       this.setState({messageType: rowData.messageType})
     } else if (rowData.api && rowData.api.length > 0) {
-      console.log("rowData.api" + rowData.api);
       this.setState({api: rowData.api})
       this.apiHandler(rowData.api);
     } else {
@@ -211,7 +208,6 @@ export default class WeiboSDK extends Component {
         </TouchableOpacity>
       )
     });
-    console.log('sectionID = ' + sectionID);
     let resultComponent = this.getResultComponent(rowData, sectionID);
     return (
       <View
@@ -372,13 +368,11 @@ export default class WeiboSDK extends Component {
 
   isWeiboAppInstalled() {
     Weibo.isWeiboAppInstalled((data) => {
-      console.log("Api返回结果 = " + data);
     })
   }
 
   isCanShareInWeiboAPP() {
     Weibo.isCanShareInWeiboAPP((data) => {
-      console.log("Api返回结果 = " + data);
       this.setState({
         apiResult: data
       })
@@ -387,7 +381,6 @@ export default class WeiboSDK extends Component {
 
   isCanSSOInWeiboApp() {
     Weibo.isCanSSOInWeiboApp((data) => {
-      console.log("Api返回结果 = " + data);
       this.setState({
         apiResult: data
       })
@@ -396,7 +389,6 @@ export default class WeiboSDK extends Component {
 
   openWeiboApp() {
     Weibo.openWeiboApp((data) => {
-      console.log("Api返回结果 = " + data);
       this.setState({
         apiResult: data
       })
@@ -405,7 +397,6 @@ export default class WeiboSDK extends Component {
 
   getWeiboAppInstallUrl() {
     Weibo.getWeiboAppInstallUrl((data) => {
-      console.log("Api返回结果 = " + data);
       this.setState({
         apiResult: data
       })
@@ -414,7 +405,6 @@ export default class WeiboSDK extends Component {
 
   getSDKVersion() {
     Weibo.getSDKVersion((data) => {
-      console.log("Api返回结果 = " + data);
       this.setState({
         apiResult: data
       })

@@ -7,6 +7,9 @@ const Weixin = NativeModules.Weixin;
 export function registerApp(config:JSON, callback) {
   Weixin.registerApp(config, callback);
 }
+export function pay(config:JSON, callback) {
+  Weixin.pay(config, callback);
+}
 export function isWXAppInstalled(callback) {
   Weixin.isWXAppInstalled(callback);
 }

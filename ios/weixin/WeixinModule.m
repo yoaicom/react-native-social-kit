@@ -13,6 +13,7 @@
 
 static RCTResponseSenderBlock authCallback;
 static RCTResponseSenderBlock shareCallback;
+static RCTResponseSenderBlock payCallback;
 
 @implementation WeixinModule
 
@@ -25,42 +26,105 @@ static RCTResponseSenderBlock shareCallback;
 
 RCT_EXPORT_MODULE(Weixin);
 //注册App
-RCT_EXPORT_METHOD(registerApp : (NSDictionary *)config : (RCTResponseSenderBlock)callback) {
+RCT_EXPORT_METHOD(registerApp
+                  : (NSDictionary *)config
+                  : (RCTResponseSenderBlock)callback) {
   NSString *appId = [config objectForKey:@"appId"];
   [WXApi registerApp:appId];
 }
 //判断微信是否登录
 RCT_EXPORT_METHOD(isWXAppInstalled : (RCTResponseSenderBlock)callback) {
-  NSString *result = [NSString stringWithFormat:@"%d", [WXApi isWXAppInstalled]];
+  NSString *result =
+      [NSString stringWithFormat:@"%d", [WXApi isWXAppInstalled]];
 
-  callback(@[result]);
+  callback(@[ result ]);
 }
 //判断微信是否支持Api
 RCT_EXPORT_METHOD(isWXAppSupportApi : (RCTResponseSenderBlock)callback) {
-  NSString *result = [NSString stringWithFormat:@"%d", [WXApi isWXAppSupportApi]];
+  NSString *result =
+      [NSString stringWithFormat:@"%d", [WXApi isWXAppSupportApi]];
 
-  callback(@[result]);
+  callback(@[ result ]);
 }
 //打开微信
 RCT_EXPORT_METHOD(openWXApp : (RCTResponseSenderBlock)callback) {
   NSString *result = [NSString stringWithFormat:@"%d", [WXApi openWXApp]];
 
-  callback(@[result]);
+  callback(@[ result ]);
 }
 //获取微信的iTunes安装地址
 RCT_EXPORT_METHOD(getWXAppInstallUrl : (RCTResponseSenderBlock)callback) {
   NSString *result = [WXApi getWXAppInstallUrl];
 
-  callback(@[result]);
+  callback(@[ result ]);
 }
 //获取Api版本
 RCT_EXPORT_METHOD(getApiVersion : (RCTResponseSenderBlock)callback) {
   NSString *result = [WXApi getApiVersion];
 
-  callback(@[result]);
+  callback(@[ result ]);
 }
+
+//支付
+RCT_EXPORT_METHOD(pay
+                  : (NSDictionary *)config
+                  : (RCTResponseSenderBlock)callback) {
+
+  payCallback = callback;
+
+  NSString *urlString = [config objectForKey:@"url"];
+  //解析服务端返回json数据
+  NSError *error;
+  //加载一个NSURL对象
+  NSURLRequest *request =
+      [NSURLRequest requestWithURL:[NSURL URLWithString:urlString]];
+  //将请求的url数据放到NSData对象中
+  NSData *response = [NSURLConnection sendSynchronousRequest:request
+                                           returningResponse:nil
+                                                       error:nil];
+  if (response != nil) {
+    NSMutableDictionary *dict = NULL;
+    // IOS5自带解析类NSJSONSerialization从response中解析出数据放到字典中
+    dict = [NSJSONSerialization JSONObjectWithData:response
+                                           options:NSJSONReadingMutableLeaves
+                                             error:&error];
+
+    NSLog(@"url:%@", urlString);
+    if (dict != nil) {
+      NSMutableString *retcode = [dict objectForKey:@"retcode"];
+      if (retcode.intValue == 0) {
+        NSMutableString *stamp = [dict objectForKey:@"timestamp"];
+
+        //调起微信支付
+        PayReq *req = [[PayReq alloc] init];
+        req.partnerId = [dict objectForKey:@"partnerid"];
+        req.prepayId = [dict objectForKey:@"prepayid"];
+        req.nonceStr = [dict objectForKey:@"noncestr"];
+        req.timeStamp = stamp.intValue;
+        req.package = [dict objectForKey:@"package"];
+        req.sign = [dict objectForKey:@"sign"];
+        [WXApi sendReq:req];
+        //日志输出
+        NSLog(@"appid=%@\npartid=%@\nprepayid=%@\nnoncestr=%@\ntimestamp=%"
+              @"ld\npackage=%@\nsign=%@",
+              [dict objectForKey:@"appid"], req.partnerId, req.prepayId,
+              req.nonceStr, (long)req.timeStamp, req.package, req.sign);
+        //        callback(@[ @"" ]);
+      } else {
+        //        callback(@[ [dict objectForKey:@"retmsg"] ]);
+      }
+    } else {
+      //      callback(@[ @"服务器返回错误，未获取到json对象" ]);
+    }
+  } else {
+    //    return callback(@[ @"服务器返回错误" ]);
+  }
+}
+
 //授权登录
-RCT_EXPORT_METHOD(authorize : (NSDictionary *)config : (RCTResponseSenderBlock)callback) {
+RCT_EXPORT_METHOD(authorize
+                  : (NSDictionary *)config
+                  : (RCTResponseSenderBlock)callback) {
 
   authCallback = callback;
 
@@ -72,14 +136,17 @@ RCT_EXPORT_METHOD(authorize : (NSDictionary *)config : (RCTResponseSenderBlock)c
 }
 
 //文件
-RCT_EXPORT_METHOD(sendFile : (NSDictionary *)config : (RCTResponseSenderBlock)callback) {
+RCT_EXPORT_METHOD(sendFile
+                  : (NSDictionary *)config
+                  : (RCTResponseSenderBlock)callback) {
   shareCallback = callback;
 
   WXMediaMessage *message = [self getMessageWithConfig:config];
 
   WXFileObject *fileObject = [WXFileObject object];
   fileObject.fileExtension = [config objectForKey:@"fileExtension"];
-  fileObject.fileData = [NSData dataWithContentsOfFile:[config objectForKey:@"filePath"]];
+  fileObject.fileData =
+      [NSData dataWithContentsOfFile:[config objectForKey:@"filePath"]];
 
   message.mediaObject = fileObject;
 
@@ -87,13 +154,16 @@ RCT_EXPORT_METHOD(sendFile : (NSDictionary *)config : (RCTResponseSenderBlock)ca
 }
 
 // gif表情
-RCT_EXPORT_METHOD(sendGif : (NSDictionary *)config : (RCTResponseSenderBlock)callback) {
+RCT_EXPORT_METHOD(sendGif
+                  : (NSDictionary *)config
+                  : (RCTResponseSenderBlock)callback) {
   shareCallback = callback;
 
   WXMediaMessage *message = [self getMessageWithConfig:config];
 
   WXEmoticonObject *emoObject = [WXEmoticonObject object];
-  emoObject.emoticonData = [NSData dataWithContentsOfFile:[config objectForKey:@"gifPath"]];
+  emoObject.emoticonData =
+      [NSData dataWithContentsOfFile:[config objectForKey:@"gifPath"]];
 
   message.mediaObject = emoObject;
 
@@ -101,14 +171,17 @@ RCT_EXPORT_METHOD(sendGif : (NSDictionary *)config : (RCTResponseSenderBlock)cal
 }
 
 //图片表情
-RCT_EXPORT_METHOD(sendNonGif : (NSDictionary *)config : (RCTResponseSenderBlock)callback) {
+RCT_EXPORT_METHOD(sendNonGif
+                  : (NSDictionary *)config
+                  : (RCTResponseSenderBlock)callback) {
   shareCallback = callback;
 
   WXMediaMessage *message = [self getMessageWithConfig:config];
 
   WXEmoticonObject *emoObject = [WXEmoticonObject object];
 
-  emoObject.emoticonData = [NSData dataWithContentsOfFile:[config objectForKey:@"nonGifPath"]];
+  emoObject.emoticonData =
+      [NSData dataWithContentsOfFile:[config objectForKey:@"nonGifPath"]];
 
   message.mediaObject = emoObject;
 
@@ -116,7 +189,9 @@ RCT_EXPORT_METHOD(sendNonGif : (NSDictionary *)config : (RCTResponseSenderBlock)
 }
 
 // App
-RCT_EXPORT_METHOD(sendApp : (NSDictionary *)config : (RCTResponseSenderBlock)callback) {
+RCT_EXPORT_METHOD(sendApp
+                  : (NSDictionary *)config
+                  : (RCTResponseSenderBlock)callback) {
   shareCallback = callback;
 
   WXMediaMessage *message = [self getMessageWithConfig:config];
@@ -138,7 +213,9 @@ RCT_EXPORT_METHOD(sendApp : (NSDictionary *)config : (RCTResponseSenderBlock)cal
 }
 
 //视频
-RCT_EXPORT_METHOD(sendVideo : (NSDictionary *)config : (RCTResponseSenderBlock)callback) {
+RCT_EXPORT_METHOD(sendVideo
+                  : (NSDictionary *)config
+                  : (RCTResponseSenderBlock)callback) {
   shareCallback = callback;
 
   WXMediaMessage *message = [self getMessageWithConfig:config];
@@ -153,7 +230,9 @@ RCT_EXPORT_METHOD(sendVideo : (NSDictionary *)config : (RCTResponseSenderBlock)c
 }
 
 //音乐
-RCT_EXPORT_METHOD(sendMusic : (NSDictionary *)config : (RCTResponseSenderBlock)callback) {
+RCT_EXPORT_METHOD(sendMusic
+                  : (NSDictionary *)config
+                  : (RCTResponseSenderBlock)callback) {
   shareCallback = callback;
 
   WXMediaMessage *message = [self getMessageWithConfig:config];
@@ -162,7 +241,8 @@ RCT_EXPORT_METHOD(sendMusic : (NSDictionary *)config : (RCTResponseSenderBlock)c
   musicObject.musicUrl = [config objectForKey:@"musicUrl"];
   musicObject.musicDataUrl = [config objectForKey:@"musicDataUrl"];
   musicObject.musicLowBandUrl = [config objectForKey:@"musicLowBandUrl"];
-  musicObject.musicLowBandDataUrl = [config objectForKey:@"musicLowBandDataUrl"];
+  musicObject.musicLowBandDataUrl =
+      [config objectForKey:@"musicLowBandDataUrl"];
 
   message.mediaObject = musicObject;
 
@@ -170,7 +250,9 @@ RCT_EXPORT_METHOD(sendMusic : (NSDictionary *)config : (RCTResponseSenderBlock)c
 }
 
 //网页link
-RCT_EXPORT_METHOD(sendWeb : (NSDictionary *)config : (RCTResponseSenderBlock)callback) {
+RCT_EXPORT_METHOD(sendWeb
+                  : (NSDictionary *)config
+                  : (RCTResponseSenderBlock)callback) {
 
   shareCallback = callback;
   WXMediaMessage *message = [self getMessageWithConfig:config];
@@ -183,23 +265,28 @@ RCT_EXPORT_METHOD(sendWeb : (NSDictionary *)config : (RCTResponseSenderBlock)cal
   [self getThumbImageWithConfig:config andSendMessage:message];
 }
 
-// 2纯图片
-RCT_EXPORT_METHOD(sendImage : (NSDictionary *)config : (RCTResponseSenderBlock)callback) {
+// 纯图片
+RCT_EXPORT_METHOD(sendImage
+                  : (NSDictionary *)config
+                  : (RCTResponseSenderBlock)callback) {
 
   shareCallback = callback;
 
   WXMediaMessage *message = [self getMessageWithConfig:config];
 
   WXImageObject *imageObject = [WXImageObject object];
-  imageObject.imageData = [NSData dataWithContentsOfFile:[config objectForKey:@"imagePath"]];
+  imageObject.imageData =
+      [NSData dataWithContentsOfFile:[config objectForKey:@"imagePath"]];
 
   message.mediaObject = imageObject;
 
   [self getThumbImageWithConfig:config andSendMessage:message];
 }
 
-// 1纯文本
-RCT_EXPORT_METHOD(sendText : (NSDictionary *)config : (RCTResponseSenderBlock)callback) {
+// 纯文本
+RCT_EXPORT_METHOD(sendText
+                  : (NSDictionary *)config
+                  : (RCTResponseSenderBlock)callback) {
   shareCallback = callback;
 
   //分享方式选择(对话,朋友圈,收藏)
@@ -219,28 +306,32 @@ RCT_EXPORT_METHOD(sendText : (NSDictionary *)config : (RCTResponseSenderBlock)ca
   return message;
 }
 
-- (void)getThumbImageWithConfig:(NSDictionary *)config andSendMessage:(WXMediaMessage *)message {
+- (void)getThumbImageWithConfig:(NSDictionary *)config
+                 andSendMessage:(WXMediaMessage *)message {
   NSString *thumbImage = [config objectForKey:@"thumbImage"];
   __weak typeof(self) weakSelf = self;
   if (thumbImage.length && _bridge.imageLoader) {
-    NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:thumbImage]];
-    [_bridge.imageLoader loadImageWithURLRequest:request
-                                            size:CGSizeMake(100, 100)
-                                           scale:1
-                                         clipped:FALSE
-                                      resizeMode:RCTResizeModeStretch
-                                   progressBlock:nil
-                                 completionBlock:^(NSError *error, UIImage *image) {
-                                   [message setThumbImage:image];
-                                   [weakSelf sendReqWithMessage:message config:config];
-                                 }];
+    NSURLRequest *request =
+        [NSURLRequest requestWithURL:[NSURL URLWithString:thumbImage]];
+    [_bridge.imageLoader
+        loadImageWithURLRequest:request
+                           size:CGSizeMake(100, 100)
+                          scale:1
+                        clipped:FALSE
+                     resizeMode:RCTResizeModeStretch
+                  progressBlock:nil
+                completionBlock:^(NSError *error, UIImage *image) {
+                  [message setThumbImage:image];
+                  [weakSelf sendReqWithMessage:message config:config];
+                }];
   } else {
     [message setThumbImage:nil];
     [weakSelf sendReqWithMessage:message config:config];
   }
 }
 
-- (void)sendReqWithMessage:(WXMediaMessage *)message config:(NSDictionary *)config {
+- (void)sendReqWithMessage:(WXMediaMessage *)message
+                    config:(NSDictionary *)config {
 
   int scene = [self judgeSceneTypeWithConfig:config];
 
@@ -276,7 +367,8 @@ RCT_EXPORT_METHOD(sendText : (NSDictionary *)config : (RCTResponseSenderBlock)ca
     NSString *lang = authResp.lang;
     NSString *state = authResp.state;
 
-    NSMutableDictionary *results = [[NSMutableDictionary alloc] initWithCapacity:4];
+    NSMutableDictionary *results =
+        [[NSMutableDictionary alloc] initWithCapacity:4];
     if (code) {
       [results setObject:code forKey:@"code"];
     }
@@ -290,11 +382,9 @@ RCT_EXPORT_METHOD(sendText : (NSDictionary *)config : (RCTResponseSenderBlock)ca
       [results setObject:state forKey:@"state"];
     }
 
-    authCallback(@[results]);
+    authCallback(@[ results ]);
     authCallback = nil;
-  }
-
-  if ([resp isKindOfClass:[SendMessageToWXResp class]]) {
+  } else if ([resp isKindOfClass:[SendMessageToWXResp class]]) {
     SendMessageToWXResp *messageResp = (SendMessageToWXResp *)resp;
     NSString *errCode = [NSString stringWithFormat:@"%d", messageResp.errCode];
     NSString *errStr = messageResp.errStr;
@@ -302,7 +392,8 @@ RCT_EXPORT_METHOD(sendText : (NSDictionary *)config : (RCTResponseSenderBlock)ca
     NSString *lang = messageResp.lang;
     NSString *country = messageResp.country;
 
-    NSMutableDictionary *results = [[NSMutableDictionary alloc] initWithCapacity:5];
+    NSMutableDictionary *results =
+        [[NSMutableDictionary alloc] initWithCapacity:5];
     if (errCode) {
       [results setObject:errCode forKey:@"errCode"];
     }
@@ -319,8 +410,32 @@ RCT_EXPORT_METHOD(sendText : (NSDictionary *)config : (RCTResponseSenderBlock)ca
       [results setObject:country forKey:@"country"];
     }
 
-    shareCallback(@[results]);
+    shareCallback(@[ results ]);
     shareCallback = nil;
+  } else if ([resp isKindOfClass:[PayResp class]]) {
+    PayResp *payResp = (PayResp *)resp;
+
+    NSString *errCode = [NSString stringWithFormat:@"%d", payResp.errCode];
+    NSString *errStr = payResp.errStr;
+    NSString *type = [NSString stringWithFormat:@"%d", payResp.type];
+    NSString *returnKey = payResp.returnKey;
+
+    NSMutableDictionary *results =
+        [[NSMutableDictionary alloc] initWithCapacity:5];
+    if (errCode) {
+      [results setObject:errCode forKey:@"errCode"];
+    }
+    if (errStr) {
+      [results setObject:errStr forKey:@"errStr"];
+    }
+    if (type) {
+      [results setObject:type forKey:@"type"];
+    }
+    if (returnKey) {
+      [results setObject:returnKey forKey:@"returnKey"];
+    }
+
+    payCallback(@[ results ]);
   }
 }
 
