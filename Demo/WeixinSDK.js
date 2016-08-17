@@ -507,7 +507,13 @@ export default class WeixinSDK extends Component {
 
   pay() {
     Weixin.pay(
-      {url:"http://wxpay.weixin.qq.com/pub_v2/app/app_pay.php?plat=ios"},
+      null,
+      (data) =>{
+        console.log(JSON.stringify(data));
+        this.setState({
+          apiResult: data
+        })
+      },
       (data) =>{
         console.log(JSON.stringify(data));
         this.setState({
