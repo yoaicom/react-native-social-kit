@@ -10,21 +10,6 @@ import {
 } from 'react-native';
 
 import Home from './Home';
-import Weixin from  './WeixinSDK';
-
-// export default class Demo extends Component {
-//
-//   constructor(props) {
-//     super(props);
-//     this.state = {}
-//   }
-//
-//   render () {
-//     return(
-//       <Home/>
-//     )
-//   }
-// }
 
 export default class Demo1 extends Component {
 

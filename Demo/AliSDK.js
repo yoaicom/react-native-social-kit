@@ -23,7 +23,10 @@ export default class AliSDK extends Component {
 
   constructor(props) {
     super(props);
-    this.state = {}
+    this.state = {
+      result:'',
+      payResult:''
+    }
   }
 
   render() {
@@ -41,12 +44,23 @@ export default class AliSDK extends Component {
           >{this.props.title?this.props.title:'微信'}</Text>
         </View>
         <TouchableOpacity
-          style={{width: 300,height: 50,marginTop:20,alignSelf:'center',backgroundColor: 'green',justifyContent: 'space-around',borderWidth: 1 / PixelRatio.get(),marginBottom: 5}}
+          style={{width: 310,height: 50,marginTop:20,alignSelf:'center',backgroundColor: 'green',justifyContent: 'space-around',borderWidth: 1 / PixelRatio.get(),marginBottom: 5}}
+          onPress = {this.pay.bind(this)}
         >
           <Text
             style = {{fontSize: 25, fontWeight: 'bold', alignSelf: 'center'}}
           >支付</Text>
         </TouchableOpacity>
+
+        <View style={[styles.resultRow,{alignSelf:'center'}]}>
+          <Text style={styles.text}>支付下单返回</Text>
+          <Text style={styles.text}>{this.state.result}</Text>
+        </View>
+
+        <View style={[styles.resultRow,{alignSelf:'center'}]}>
+          <Text style={styles.text}>支付返回</Text>
+          <Text style={styles.text}>{this.state.payResult}</Text>
+        </View>
 
       </View>
     )
@@ -64,9 +78,11 @@ export default class AliSDK extends Component {
       {},
       (data)=> {
         console.log(JSON.stringify(data));
+        this.setState({result:JSON.stringify(data)})
       },
       (data)=> {
         console.log(JSON.stringify(data));
+        this.setState({payResult:JSON.stringify(data)})
       }
     )
   }
