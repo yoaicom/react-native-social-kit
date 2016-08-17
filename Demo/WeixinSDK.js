@@ -328,7 +328,7 @@ export default class WeixinSDK extends Component {
   shareTextToWXReq(scene) {
     Weixin.shareText({
       text: "你好这里是有爱官网",
-      scene: scene,
+      scene: scene
     }, (data) => {
       this.setState({shareResult: JSON.stringify(data)})
     });

@@ -12,6 +12,7 @@
 #import "RCTBundleURLProvider.h"
 #import "RCTRootView.h"
 
+#import "AliModule.h"
 #import "QQModule.h"
 #import "WeiboModule.h"
 #import "WeixinModule.h"
@@ -44,7 +45,7 @@
 
 - (BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url {
   return [WeixinModule handleOpenURL:url] || [WeiboModule handleOpenURL:url] ||
-         [QQModule handleOpenURL:url];
+         [QQModule handleOpenURL:url] || [AliModule handleUrl:url];
 }
 
 - (BOOL)application:(UIApplication *)application
@@ -52,7 +53,7 @@
   sourceApplication:(NSString *)sourceApplication
          annotation:(id)annotation {
   return [WeixinModule handleOpenURL:url] || [WeiboModule handleOpenURL:url] ||
-         [QQModule handleOpenURL:url];
+         [QQModule handleOpenURL:url] || [AliModule handleUrl:url];
 }
 
 @end

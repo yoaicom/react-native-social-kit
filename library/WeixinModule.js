@@ -32,7 +32,7 @@ export function shareText(config:JSON, callback) {
 export function shareImage(config:JSON, callback) {
   Weixin.sendImage(config, callback);
 }
-export function shareWeb(config:JSON, callback) {
+export function shareWebPage(config:JSON, callback) {
   Weixin.sendWeb(config, callback);
 }
 export function shareMusic(config:JSON, callback) {

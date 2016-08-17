@@ -5,6 +5,10 @@
 
 **项目仍在开发中，功能不稳定，请耐心等待。**
 
+# Demo
+![Demo](./gif/Demo.gif)
+
+
 # 安装
 `npm install --save react-native-social-kit@latest`  
 
@@ -16,32 +20,89 @@
 在Podfile里添加
 
  ```
- pod "react-native-social-sdk", :path => '../node_modules/react-native-social-kit'
+target 'Demo' do
+
+pod "react-native-social-kit", :path => '../node_modules/react-native-social-kit'
+
+end
  ```
 然后执行命令`pod install`。（*是不是很简单！*）
 
 修改AppDelegate.m文件如下：
 
 ```objective-c
-#import "WeixinModule.h"
-#import "WeiboModule.h"
-#import "QQModule.h"
-...
-  
-- (BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url
-{
-  return [WeixinModule handleOpenURL:url] || [WeiboModule handleOpenURL:url] || [QQModule handleOpenURL:url];
-}
 
-- (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation
-{
-  return [WeixinModule handleOpenURL:url] || [WeiboModule handleOpenURL:url] || [QQModule handleOpenURL:url];
-}
+	#import "WeixinModule.h"
+	#import "WeiboModule.h"
+	#import "QQModule.h"
+	#import "AliModule.h"
+	...
+  
+	- (BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url
+	{
+ 		 return [WeixinModule handleOpenURL:url] || [WeiboModule handleOpenURL:url] || [QQModule handleOpenURL:url] || [AliModule handleUrl:url];
+	}
+
+	- (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation
+	{
+  		return [WeixinModule handleOpenURL:url] || [WeiboModule handleOpenURL:url] || [QQModule handleOpenURL:url] || [AliModule handleUrl:url];
+	}
+```
+
+
+##### 此外，为了适配iOS9.0中的App Transport Security(ATS)对http的限制，需要在info.plist中修改配置
+
+```
+<key>NSAppTransportSecurity</key>
+    <dict>    
+        <key>NSAllowsArbitraryLoads</key><true/>
+    </dict>
+```
+
+##### 或者针对指定域名开放权限，以支付宝为例：
+
+```
+<key>NSAppTransportSecurity</key>
+    <dict>
+        <key>NSExceptionDomains</key>
+        <dict>
+            <key>alipay.com</key>
+            <dict>
+                <key>NSIncludesSubdomains</key>
+                <true/>
+                <key>NSTemporaryExceptionAllowsInsecureHTTPLoads</key>
+                <true/>
+                <key>NSTemporaryExceptionMinimumTLSVersion</key>
+                <string>TLSv1.0</string>
+                <key>NSTemporaryExceptionRequiresForwardSecrecy</key>
+                <false/>
+            </dict>
+            <key>alipayobjects.com</key>
+            <dict>
+                <key>NSIncludesSubdomains</key>
+                <true/>
+                <key>NSTemporaryExceptionAllowsInsecureHTTPLoads</key>
+                <true/>
+                <key>NSTemporaryExceptionMinimumTLSVersion</key>
+                <string>TLSv1.0</string>
+                <key>NSTemporaryExceptionRequiresForwardSecrecy</key>
+                <false/>
+            </dict>
+        </dict>
+    </dict>
 ```
 
 ##### 微信
 
 在**Xcode**中选中**TARGETS**，在**info**标签栏的**URL Types**项目下添加子项，子项的**URL Schemes**为你所注册的应用程序的AppId。
+
+```
+<key>LSApplicationQueriesSchemes</key>
+<array>
+    <string>wechat</string>
+	<string>weixin</string>
+</array>
+```
 
 ##### 微博
 
@@ -78,6 +139,17 @@
 </array>
 ```
 
+##### 支付宝
+
+在**Xcode**中选中**TARGETS**，在**info**标签栏的**URL Types**项目下添加子项，子项的**URL Schemes**为你实际app的scheme名称。
+
+```
+<key>LSApplicationQueriesSchemes</key>
+<array>
+    <string>alipay</string>
+    <string>alipayshare</string>
+</array>
+```
 
 
 ## Android
@@ -180,13 +252,13 @@ In your JavaScript code:
 
 ```javascript
 import SocialKit from 'react-native-social-kit';
-const {Weibo, Weixin, QQ} = SocialKit;
+const {Weibo, Weixin, QQ, Ali} = SocialKit;
 ```
 
 or simply
 
 ```javascript
-import {Weibo, Weixin, QQ} from 'react-native-social-kit';
+import {Weibo, Weixin, QQ, Ali} from 'react-native-social-kit';
 ```
 Then, use it like:
 
@@ -206,14 +278,45 @@ Weibo.authorize({
 ```
 
 
+# 注册App
 
-# API
-
-##### XXX.authorize(config, (data) => {
+##### SDKNAME.authorize(config, (data) => {
 
 ##### })
 
-​	获取用户授权（XXX表示Weixin、Weibo、QQ）
+
+SDKNAME表示Weixin、Weibo、QQ ,Ali 下同
+
+使用授权登陆等功能之前首先需要注册App,在js端写入如下代码 以QQ为例
+
+```
+  componentWillMount() {
+    // 注册App
+    QQ.registerApp({
+      appId: "222222"
+    }, (data) => {
+    });
+  }
+```
+
+###### 参数配置
+
+| SDKNAME         | config                | 
+| ----------------| --------------------- |
+| Weixin          | {appId: ''}           | 
+| Weibo           | {appKey: ''}          |
+| QQ              | {appId: ''}           |
+
+
+
+
+# 授权登陆API
+
+##### SDKNAME.registerApp(config, (data) => {
+
+##### })
+
+​	
 
 ###### config
 
@@ -222,8 +325,10 @@ Weibo.authorize({
 | key         | value                                    | Weixin |  Weibo  |   QQ    |
 | ----------- | ---------------------------------------- | ------ | :-----: | :-----: |
 | appId       | 第三方账号的App Key或App ID，必填                  | OK     |   OK    |   OK    |
-| redirectUrl | 微博授权回调页，一般为"https://api.weibo.com/oauth2/default.html"，必填 | OK     |   NA    |   NA    |
+| redirectUrl | 微博授权回调页，一般为"https://api.weibo.com/oauth2/default.html"，必填 | NA     |   OK    |   NA    |
 | scope       | 授权的权限范围，可不填，默认最低权限                       | NA     | Not Yet | Not Yet |
+| state       | 用于保持请求和回调的状态，授权请求后原样带回给第三方。该参数可用于防止csrf攻击（跨站请求伪造攻击）       | OK     | NA | NA |
+| permissions | 发送授权范围请求       | NA     | NA | OK |
 
 ###### data
 
@@ -259,6 +364,24 @@ QQ授权结果
 | accessToken      |       |
 | expiresInSeconds |       |
 
+
+
+# 分享API 
+
+##### SDKNAME.share'MessageType'(config, (data) => {
+
+##### })
+
+MessageType 不同模块能分享的内容不同 见下表:
+
+| SDKNAME              | Text |Image |ImageArray |WebPage |Music |Video |App | NonGif|Gif | File| 
+| ---------------------| ---- |------|-----------|--------|------|------|----|-------|----|-----| 
+| Weixin               |   √  |   √  |     x     |    √   |  √   |   √  |  √ |    √  |  √ |   √ | 
+| Weibo                |   √  |   √  |     x     |    √   |  √   |   √  |  x |    x  |  x |   x | 
+| QQ                   |   √  |   √  |     √     |    √   |  √   |   √  |  x |    x  |  x |   x | 
+
+
+具体参数配置见[Demo]()
 
 
 # 关于我们
