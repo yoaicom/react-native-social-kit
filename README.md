@@ -381,7 +381,13 @@ MessageType 不同模块能分享的内容不同 见下表:
 | QQ                   |   √  |   √  |     √     |    √   |  √   |   √  |  x |    x  |  x |   x | 
 
 
-具体参数配置见[Demo]()
+具体参数配置见[Demo](./Demo)
+
+# 支付API 
+
+##### SDKNAME.pay(config, (data) => {
+
+##### })
 
 
 # 关于我们
