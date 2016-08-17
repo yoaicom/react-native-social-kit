@@ -151,10 +151,10 @@ export default class WeixinSDK extends Component {
 
   componentWillMount() {
     // 注册App
-    Weixin.registerApp({
-      appId: "wx1dd0b08688eecaef"
-    }, (data) => {
-    });
+    // Weixin.registerApp({
+    //   appId: "wx1dd0b08688eecaef"
+    // }, (data) => {
+    // });
   }
 
   render() {
