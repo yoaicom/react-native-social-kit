@@ -4,11 +4,7 @@ import {View, Text, TouchableOpacity, PixelRatio, StyleSheet} from 'react-native
 import WeixinSDK from  './WeixinSDK';
 import WeiboSDK from './WeiboSDK';
 import QQSDK from './QQSDK';
-
-
-import sdk from 'react-native-social-kit';
-let Ali = sdk.Ali;
-
+import AliSDK from './AliSDK';
 
 export default class Home extends Component {
 
@@ -101,10 +97,17 @@ export default class Home extends Component {
   }
 
   aliPress() {
-    Ali.pay({} ,
-      (data) => {console.log(JSON.stringify(data));},
-      (data) => {console.log(JSON.stringify((data)));}
-    )
+    const {navigator} = this.props;
+
+    if (navigator) {
+      navigator.push({
+        name: 'AliSDK',
+        component: AliSDK,
+        params: {
+          title: 'Ali'
+        }
+      })
+    }
   }
 
 }
@@ -119,4 +122,4 @@ var styles = StyleSheet.create({
     marginBottom: 5
   },
   text: {fontSize: 25, fontWeight: 'bold', alignSelf: 'center'}
-})
+});
