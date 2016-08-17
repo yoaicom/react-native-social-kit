@@ -387,7 +387,18 @@ MessageType 不同模块能分享的内容不同 见下表:
 
 ##### SDKNAME.pay(config, (data) => {
 
-##### })
+##### },
+(data) => {
+
+##### }
+)
+
+###### config参数配置
+
+| SDKNAME         | config                | 
+| ----------------| --------------------- |
+| Weixin          | {retcode:'',timestamp:'',partnerid:'',prepayid:'',noncestr:'',package:'',sign:''}           | 
+| Ali             | {appKey: ''}          |
 
 
 # 关于我们
