@@ -1,0 +1,7 @@
+target 'Demo' do
+
+pod "React", :path => '../node_modules/react-native', :subspecs => ['Core', 'RCTActionSheet', 'RCTGeolocation', 'RCTImage', 'RCTNetwork', 'RCTSettings', 'RCTText', 'RCTVibration', 'RCTWebSocket']
+
+pod "react-native-social-kit", :path => '../node_modules/react-native-social-kit'
+
+end
