@@ -398,7 +398,7 @@ MessageType 不同模块能分享的内容不同 见下表:
 | SDKNAME         | config                | 
 | ----------------| --------------------- |
 | Weixin          | {retcode:'',timestamp:'',partnerid:'',prepayid:'',noncestr:'',package:'',sign:''}           | 
-| Ali             | {appKey: ''}          |
+| Ali             | {orderString: '',appScheme:''}          |
 
 
 # 关于我们
