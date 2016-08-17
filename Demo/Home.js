@@ -5,6 +5,11 @@ import WeixinSDK from  './WeixinSDK';
 import WeiboSDK from './WeiboSDK';
 import QQSDK from './QQSDK';
 
+
+import sdk from 'react-native-social-kit';
+let Ali = sdk.Ali;
+
+
 export default class Home extends Component {
 
   constructor(props) {
@@ -40,6 +45,14 @@ export default class Home extends Component {
           <Text
             style={styles.text}
           >QQ</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={this.aliPress.bind(this)}
+        >
+          <Text
+            style={styles.text}
+          >Ali</Text>
         </TouchableOpacity>
       </View>
     )
@@ -85,6 +98,13 @@ export default class Home extends Component {
         }
       })
     }
+  }
+
+  aliPress() {
+    Ali.pay({} ,
+      (data) => {console.log(JSON.stringify(data));},
+      (data) => {console.log(JSON.stringify((data)));}
+    )
   }
 
 }

@@ -80,10 +80,12 @@ EOM
   esac
 }
 if [[ "$CONFIGURATION" == "Debug" ]]; then
+  install_resource "../../node_modules/react-native-social-kit/ios/ali/AliSDK/AlipaySDK.bundle"
   install_resource "../../node_modules/react-native-social-kit/ios/qq/QQSDK/TencentOpenApi_IOS_Bundle.bundle"
   install_resource "../../node_modules/react-native-social-kit/ios/weibo/WeiboSDK/WeiboSDK.bundle"
 fi
 if [[ "$CONFIGURATION" == "Release" ]]; then
+  install_resource "../../node_modules/react-native-social-kit/ios/ali/AliSDK/AlipaySDK.bundle"
   install_resource "../../node_modules/react-native-social-kit/ios/qq/QQSDK/TencentOpenApi_IOS_Bundle.bundle"
   install_resource "../../node_modules/react-native-social-kit/ios/weibo/WeiboSDK/WeiboSDK.bundle"
 fi

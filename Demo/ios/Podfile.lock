@@ -1,8 +1,10 @@
 PODS:
   - react-native-social-kit (0.0.7):
+    - react-native-social-kit/Ali (= 0.0.7)
     - react-native-social-kit/QQ (= 0.0.7)
     - react-native-social-kit/Weibo (= 0.0.7)
     - react-native-social-kit/Weixin (= 0.0.7)
+  - react-native-social-kit/Ali (0.0.7)
   - react-native-social-kit/QQ (0.0.7)
   - react-native-social-kit/Weibo (0.0.7)
   - react-native-social-kit/Weixin (0.0.7)
@@ -45,7 +47,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   React: 2295aaed0bcaa7a0dd847504e0caa0d3b3f23305
-  react-native-social-kit: 63e4f8ff23bc57e8bb1597b58d3ac2bdfec899ee
+  react-native-social-kit: 87674059ef6070785cc374bd023794833e8a2098
 
 PODFILE CHECKSUM: 54862a41fc5cd493923b78c36f68343772fe7eba
 

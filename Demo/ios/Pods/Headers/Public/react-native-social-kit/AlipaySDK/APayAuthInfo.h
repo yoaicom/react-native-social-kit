@@ -1,0 +1,1 @@
+../../../../../../node_modules/react-native-social-kit/ios/ali/AliSDK/AlipaySDK.framework/Headers/APayAuthInfo.h

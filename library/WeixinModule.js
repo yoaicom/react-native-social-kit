@@ -1,5 +1,3 @@
-'use strict';
-
 import {NativeModules} from 'react-native';
 
 const Weixin = NativeModules.Weixin;

@@ -7,7 +7,7 @@ Pod::Spec.new do |s|
   s.license = "MIT"
   s.summary      = "social sdk"
 	s.homepage = "https://github.com/yoaicom/react-native-social-kit"
-  s.source       = { :git => "https://github.com/yoaicom/react-native-social-kit.git"}
+  s.source   = { :git => "https://github.com/yoaicom/react-native-social-kit.git"}
   s.subspec 'Weixin' do |ss|
     ss.source_files  ="ios/weixin/*.{h,m}","ios/weixin/WeixinSDK/*.{h,m}"
   	ss.resource     = 'ios/weixin/WeixinSDK/*.bundle'
@@ -32,6 +32,14 @@ Pod::Spec.new do |s|
   	ss.vendored_frameworks = 'ios/qq/QQSDK/*.framework'
   	ss.frameworks = 'Security','CoreGraphics','SystemConfiguration','CoreTelephony'
   	ss.libraries  = 'iconv','stdc++','z','sqlite3'
+  end 
+  
+  s.subspec 'Ali' do |ss|
+    ss.source_files  ="ios/ali/*.{h,m}","ios/ali/AliSDK/*.{h,m}"
+    ss.resource     = 'ios/ali/AliSDK/*.bundle'
+  	ss.vendored_frameworks = 'ios/ali/AliSDK/*.framework'
+  	ss.frameworks = 'SystemConfiguration','CoreTelephony','QuartzCore','CoreText','CoreGraphics','UIKit','Foundation','CFNetwork','CoreMotion'
+  	ss.libraries  = 'c++','z'
   end 
   
 end

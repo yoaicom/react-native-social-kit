@@ -77,6 +77,30 @@
         "z",
         "sqlite3"
       ]
+    },
+    {
+      "name": "Ali",
+      "source_files": [
+        "ios/ali/*.{h,m}",
+        "ios/ali/AliSDK/*.{h,m}"
+      ],
+      "resources": "ios/ali/AliSDK/*.bundle",
+      "vendored_frameworks": "ios/ali/AliSDK/*.framework",
+      "frameworks": [
+        "SystemConfiguration",
+        "CoreTelephony",
+        "QuartzCore",
+        "CoreText",
+        "CoreGraphics",
+        "UIKit",
+        "Foundation",
+        "CFNetwork",
+        "CoreMotion"
+      ],
+      "libraries": [
+        "c++",
+        "z"
+      ]
     }
   ]
 }
