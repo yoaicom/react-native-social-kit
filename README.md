@@ -385,13 +385,15 @@ MessageType 不同模块能分享的内容不同 见下表:
 
 # 支付API 
 
-##### SDKNAME.pay(config, (data) => {
+##### SDKNAME.pay(
+##### config, 
+##### (data) => {
 
-##### },
-(data) => {
+#####  },
+##### (data) => {
 
-##### }
-)
+#####  }
+##### )
 
 ###### config参数配置
 
