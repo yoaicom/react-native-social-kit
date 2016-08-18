@@ -116,9 +116,10 @@ var styles = StyleSheet.create({
   button: {
     width: 300,
     height: 50,
-    backgroundColor: 'green',
+    backgroundColor: '#90C76D',
     justifyContent: 'space-around',
     borderWidth: 1 / PixelRatio.get(),
+    borderColor:'#4E9136',
     marginBottom: 5
   },
   text: {fontSize: 25, fontWeight: 'bold', alignSelf: 'center'}

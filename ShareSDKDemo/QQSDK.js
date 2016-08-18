@@ -135,6 +135,8 @@ let DataArr = {
   }
 };
 
+import content from './ShareContent';
+
 export default class QQSDK extends Component {
 
   constructor(props) {
@@ -188,12 +190,12 @@ export default class QQSDK extends Component {
       >
         <View style={styles.navigator}>
           <Text
-            style= {{position : 'absolute',alignSelf : 'center',left: 5,top: 10,fontSize : 20,fontWeight: 'bold',color:'green'}}
+            style= {{position : 'absolute',alignSelf : 'center',left: 5,top: 10,fontSize : 20,fontWeight: 'bold',color:'#316532'}}
             onPress = {this.pop.bind(this)}
           >{'<首页'}</Text>
           <Text
             style = {{alignSelf : 'center',fontSize : 25,fontWeight: 'bold',color:'black'}}
-          >{this.props.title?this.props.title:'微信'}</Text>
+          >{this.props.title?this.props.title:'QQ'}</Text>
         </View>
         <ListView
           dataSource={dataSource.cloneWithRowsAndSections(DataArr,sectionIDs,rowIDs)}
@@ -270,9 +272,9 @@ export default class QQSDK extends Component {
   //Private
   getSelectedStyle(rowData) {
     if ((rowData.scene && rowData.scene == this.state.scene) || (rowData.messageType && rowData.messageType == this.state.messageType)) {
-      return {borderColor: 'green', backgroundColor: 'green'};
+      return {borderColor: '#4E9136', backgroundColor: '#4E9136'};
     } else if (rowData.api && rowData.api == this.state.api) {
-      return {borderColor: 'green', backgroundColor: 'green',};
+      return {borderColor: '#4E9136', backgroundColor: '#4E9136',};
     } else if (!rowData.scene && !rowData.messageType && !rowData.api) {
       return {width: 310}
     }
@@ -322,7 +324,7 @@ export default class QQSDK extends Component {
 
   shareTextToQQ(scene) {
     QQ.shareText({
-      text: "这里是一个QQ文本分享的文本",
+      text: content.text.text,
       scene: scene
     }, (data) => {
       this.setState({shareResult: JSON.stringify(data)})
@@ -331,11 +333,11 @@ export default class QQSDK extends Component {
 
   shareImageToQQ(scene) {
     QQ.shareImage({
-      title: "QQ图片分享",
-      description: "这里是一个QQ图片分享的文本",
+      title: content.image.title,
+      description: content.image.description,
       scene: scene,
-      imagePath: resolveAssetSource(require('./jpg/tampon0.jpg')).uri,
-      previewImagePath: thumbnail,
+      imagePath:content.image.imagePath,
+      previewImagePath: content.image.thumbnail,
     }, (data) => {
       this.setState({shareResult: JSON.stringify(data)})
     });
@@ -343,13 +345,11 @@ export default class QQSDK extends Component {
 
   shareImageArrayToQQ(scene) {
     QQ.shareImageArray({
-      title: "QQ多图分享",
-      description: "这里是一个QQ多图分享的文本",
+      title: content.imageArray.title,
+      description: content.imageArray.description,
       scene: scene,
-      previewImagePath: thumbnail,
-      imageArray: [imageUrl, imageUrl1, imageUrl2, imageUrl3, imageUrl4],
-      previewImageURL: thumbImage,
-      url: "http://a.hiphotos.baidu.com/zhidao/pic/item/ac6eddc451da81cb91b89bd25666d01609243156.jpg",
+      previewImagePath: content.imageArray.thumbnail,
+      imageArray: content.imageArray.imageArray,
     }, (data) => {
       this.setState({shareResult: JSON.stringify(data)})
     });
@@ -357,10 +357,10 @@ export default class QQSDK extends Component {
 
   shareWebPageToQQ(scene) {
     QQ.shareWebPage({
-      title: "QQ网页分享",
-      description: "这是一个QQ网页分享的示例",
-      url: "http://sina.cn?a=1",
-      previewImageURL: thumbImage,
+      title: content.webPage.title,
+      description: content.webPage.description,
+      url: content.webPage.webpageUrl,
+      previewImageURL: content.webPage.thumbImage,
       // previewImageURL: "http://a.hiphotos.baidu.com/zhidao/pic/item/ac6eddc451da81cb91b89bd25666d01609243156.jpg",
       scene: scene,
     }, (data) => {
@@ -370,12 +370,12 @@ export default class QQSDK extends Component {
 
   shareMusicToQQ(scene) {
     QQ.shareMusic({
-      title: "QQ音乐分享",
-      description: "这是一个QQ音乐分享的示例",
-      url: "http://y.qq.com/#type=song&id=103347",
-      previewImageURL: thumbImage,
+      title: content.music.title,
+      description: content.music.description,
+      url: content.music.musicUrl,
+      previewImageURL: content.music.thumbImage,
       // previewImageURL: "http://a.hiphotos.baidu.com/zhidao/pic/item/ac6eddc451da81cb91b89bd25666d01609243156.jpg",
-      flashURL: "http://player.video.qiyi.com/0bb2ae16923822161de984728ac5c415/0/0/v_19rrmdkfh4.swf-albumId=517678900-tvId=517678900-isPurchase=0-cnId=6",
+      flashURL: content.music.musicDataUrl,
       scene: scene,
     }, (data) => {
       this.setState({shareResult: JSON.stringify(data)})
@@ -384,12 +384,12 @@ export default class QQSDK extends Component {
 
   shareVideoToQQ(scene) {
     QQ.shareVideo({
-      title: "QQ视频分享",
-      description: "这是一个QQ视频分享的示例",
-      url: "http://y.qq.com/#type=song&id=103347",
-      previewImageURL: thumbImage,
+      title: content.video.title,
+      description: content.video.description,
+      url: content.video.videoUrl,
+      previewImageURL: content.video.thumbImage,
       // previewImageURL: "http://a.hiphotos.baidu.com/zhidao/pic/item/ac6eddc451da81cb91b89bd25666d01609243156.jpg",
-      flashURL: "http://player.video.qiyi.com/0bb2ae16923822161de984728ac5c415/0/0/v_19rrmdkfh4.swf-albumId=517678900-tvId=517678900-isPurchase=0-cnId=6",
+      flashURL: content.video.flashURL,
       scene: scene,
     }, (data) => {
       this.setState({shareResult: JSON.stringify(data)})

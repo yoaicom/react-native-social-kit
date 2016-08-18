@@ -11,16 +11,13 @@ import {
 } from 'react-native';
 
 import sdk from 'react-native-social-kit';
-let resolveAssetSource = require('resolveAssetSource');
+let Weixin = sdk.Weixin;
 
 import styles from './Style';
 let WINDOW_WIDTH = Dimensions.get('window').width;
 let WINDOW_HEIGHT = Dimensions.get('window').height;
 
-let Weixin = sdk.Weixin;
-
-let path = require('./jpg/res2.jpg');
-let thumbImage = "file://" + resolveAssetSource(path).uri;
+import content from  './ShareContent';
 
 let DataArr = {
   '分享方式': {
@@ -151,10 +148,10 @@ export default class WeixinSDK extends Component {
 
   componentWillMount() {
     // 注册App
-    // Weixin.registerApp({
-    //   appId: "wx1dd0b08688eecaef"
-    // }, (data) => {
-    // });
+    Weixin.registerApp({
+      appId: "wx1dd0b08688eecaef"
+    }, (data) => {
+    });
   }
 
   render() {
@@ -189,7 +186,7 @@ export default class WeixinSDK extends Component {
       >
         <View style={styles.navigator}>
           <Text
-            style= {{position : 'absolute',alignSelf : 'center',left: 5,top: 10,fontSize : 20,fontWeight: 'bold',color:'green'}}
+            style= {{position : 'absolute',alignSelf : 'center',left: 5,top: 10,fontSize : 20,fontWeight: 'bold',color:'#316532'}}
             onPress = {this.pop.bind(this)}
           >{'<首页'}</Text>
           <Text
@@ -270,9 +267,9 @@ export default class WeixinSDK extends Component {
   //Private
   getSelectedStyle(rowData) {
     if ((rowData.scene && rowData.scene == this.state.scene) || (rowData.messageType && rowData.messageType == this.state.messageType)) {
-      return {borderColor: 'green', backgroundColor: 'green'};
+      return {borderColor: '#4E9136', backgroundColor: '#4E9136'};
     } else if (rowData.api && rowData.api == this.state.api) {
-      return {borderColor: 'green', backgroundColor: 'green',};
+      return {borderColor: '#4E9136', backgroundColor: '#4E9136',};
     } else if (!rowData.scene && !rowData.messageType && !rowData.api) {
       return {width: 310}
     }
@@ -309,7 +306,7 @@ export default class WeixinSDK extends Component {
     } else if (this.state.messageType == 'image') {
       this.shareImageToWXReq(this.state.scene);
     } else if (this.state.messageType == 'webLink') {
-      this.shareWebToWXReq(this.state.scene);
+      this.shareWebPageToWXReq(this.state.scene);
     } else if (this.state.messageType == 'music') {
       this.shareMusicToWXReq(this.state.scene);
     } else if (this.state.messageType == 'video') {
@@ -327,31 +324,32 @@ export default class WeixinSDK extends Component {
 
   shareTextToWXReq(scene) {
     Weixin.shareText({
-      text: "你好这里是有爱官网",
+      text: content.text.text,
       scene: scene
     }, (data) => {
+      console.log(JSON.stringify(data));
       this.setState({shareResult: JSON.stringify(data)})
     });
   }
 
   shareImageToWXReq(scene) {
     Weixin.shareImage({
-      text: "你好这里是有爱官网",
+      text: content.image.title,
       scene: scene,
-      imagePath: resolveAssetSource(require('./jpg/tampon0.jpg')).uri,
-      thumbImage: thumbImage
+      imagePath: content.image.imagePath,
+      thumbImage: content.image.thumbImage,
     }, (data) => {
-      this.setState({shareResult: JSON.stringify(shareResult)})
+      this.setState({shareResult: JSON.stringify(data)})
     });
   }
 
-  shareWebToWXReq(scene) {
-    Weixin.shareWeb({
-      title: "网页分享",
-      description: "这是一个网页分享",
+  shareWebPageToWXReq(scene) {
+    Weixin.shareWebPage({
+      title: content.webPage.title,
+      description: content.webPage.description,
       scene: scene,
-      webpageUrl: "http://www.yoai.com/",
-      thumbImage: thumbImage
+      webpageUrl: content.webPage.webpageUrl,
+      thumbImage: content.webPage.thumbImage
     }, (data) => {
       this.setState({shareResult: JSON.stringify(data)})
     });
@@ -359,12 +357,12 @@ export default class WeixinSDK extends Component {
 
   shareMusicToWXReq(scene) {
     Weixin.shareMusic({
-      title: "音乐分享",
-      description: "这是一个音乐分享",
-      musicUrl: "http://y.qq.com/#type=song&id=103347",
-      musicDataUrl: "http://stream20.qqmusic.qq.com/32464723.mp3",
+      title: content.music.title,
+      description: content.music.description,
+      musicUrl: content.music.musicUrl,
+      musicDataUrl: content.music.musicDataUrl,
       scene: scene,
-      thumbImage: thumbImage
+      thumbImage: content.music.thumbImage
     }, (data) => {
       this.setState({shareResult: JSON.stringify(data)})
     });
@@ -373,11 +371,11 @@ export default class WeixinSDK extends Component {
   shareVideoToWXReq(scene) {
 
     Weixin.shareVideo({
-      title: "视频分享",
-      description: "这是一个视频分享",
-      videoUrl: "http://v.youku.com/v_show/id_XNTUxNDY1NDY4.html",
+      title: content.video.title,
+      description: content.video.description,
+      videoUrl: content.video.videoUrl,
       scene: scene,
-      thumbImage: thumbImage
+      thumbImage: content.video.thumbImage
     }, (data) => {
       this.setState({shareResult: JSON.stringify(data)})
     });
@@ -386,12 +384,12 @@ export default class WeixinSDK extends Component {
   shareAppToWXReq(scene) {
 
     Weixin.shareApp({
-      title: "App分享",
-      description: "这是一个App分享",
-      extInfo: "<xml>extend info</xml>",
-      url: "http://weixin.qq.com",
+      title: content.app.title,
+      description: content.app.description,
+      extInfo: content.app.extInfo,
+      url: content.app.url,
       scene: scene,
-      thumbImage: thumbImage
+      thumbImage: content.app.thumbImage
     }, (data) => {
       this.setState({shareResult: JSON.stringify(data)})
     });
@@ -400,11 +398,11 @@ export default class WeixinSDK extends Component {
   shareNonGifToWXReq(scene) {
 
     Weixin.shareNonGif({
-      title: "图片表情分享",
-      description: "这是一个图片表情分享",
+      title: content.nonGif.title,
+      description: content.nonGif.description,
       scene: scene,
-      thumbImage: thumbImage,
-      nonGifPath: resolveAssetSource(require('./jpg/res7.jpg')).uri
+      thumbImage: content.nonGif.thumbImage,
+      nonGifPath: content.nonGif.nonGifPath,
     }, (data) => {
       this.setState({shareResult: JSON.stringify(data)})
     });
@@ -413,11 +411,11 @@ export default class WeixinSDK extends Component {
   shareGifToWXReq(scene) {
 
     Weixin.shareGif({
-      title: "gif表情分享",
-      description: "这是一个gif表情分享",
+      title: content.gif.title,
+      description: content.gif.title,
       scene: scene,
-      thumbImage: thumbImage,
-      gifPath: resolveAssetSource(require('./jpg/res6.gif')).uri,
+      thumbImage: content.gif.thumbImage,
+      gifPath:content.gif.gifPath,
     }, (data) => {
       this.setState({shareResult: JSON.stringify(data)})
     });
@@ -426,11 +424,11 @@ export default class WeixinSDK extends Component {
   shareFileToWXReq(scene) {
 
     Weixin.shareFile({
-      title: "文件分享",
-      description: "这是一个文件分享",
+      title: content.file.title,
+      description: content.file.description,
       scene: scene,
-      thumbImage: thumbImage,
-      filePath: resolveAssetSource(require('./jpg/ML.pdf')).uri,
+      thumbImage: content.file.thumbImage,
+      filePath: content.file.filePath,
     }, (data) => {
       this.setState({shareResult: JSON.stringify(data)})
     });

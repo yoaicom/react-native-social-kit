@@ -11,13 +11,14 @@ import {
 } from 'react-native';
 
 import sdk from 'react-native-social-kit';
+let Weibo = sdk.Weibo;
+
 let resolveAssetSource = require('resolveAssetSource');
 
 import styles from './Style';
 let WINDOW_WIDTH = Dimensions.get('window').width;
 let WINDOW_HEIGHT = Dimensions.get('window').height;
 
-let Weibo = sdk.Weibo;
 
 let path = require('./jpg/res2.jpg');
 let thumbnail = resolveAssetSource(path).uri;
@@ -101,6 +102,8 @@ let DataArr = {
 
 };
 
+import content from './ShareContent';
+
 export default class WeiboSDK extends Component {
 
   constructor(props) {
@@ -154,12 +157,12 @@ export default class WeiboSDK extends Component {
       >
         <View style={styles.navigator}>
           <Text
-            style= {{position : 'absolute',alignSelf : 'center',left: 5,top: 10,fontSize : 20,fontWeight: 'bold',color:'green'}}
+            style= {{position : 'absolute',alignSelf : 'center',left: 5,top: 10,fontSize : 20,fontWeight: 'bold',color:'#316532'}}
             onPress = {this.pop.bind(this)}
           >{'<首页'}</Text>
           <Text
             style = {{alignSelf : 'center',fontSize : 25,fontWeight: 'bold',color:'black'}}
-          >{this.props.title?this.props.title:'微信'}</Text>
+          >{this.props.title?this.props.title:'微博'}</Text>
         </View>
         <ListView
           dataSource={dataSource.cloneWithRowsAndSections(DataArr,sectionIDs,rowIDs)}
@@ -233,9 +236,9 @@ export default class WeiboSDK extends Component {
   //Private
   getSelectedStyle(rowData) {
     if (rowData.messageType && rowData.messageType == this.state.messageType) {
-      return {borderColor: 'green', backgroundColor: 'green'};
+      return {borderColor: '#4E9136', backgroundColor: '#4E9136'};
     } else if (rowData.api && rowData.api == this.state.api) {
-      return {borderColor: 'green', backgroundColor: 'green',};
+      return {borderColor: '#4E9136', backgroundColor: '#4E9136',};
     } else if (!rowData.messageType && !rowData.api) {
       return {width: 310}
     }
@@ -281,9 +284,9 @@ export default class WeiboSDK extends Component {
 
   shareTextToWeibo() {
     Weibo.shareText({
-      text: "这里是一个微博文本分享的文本",
-      redirectURI: "https://api.weibo.com/oauth2/default.html",
-      scope: "all",
+      text:content.text.text,
+      redirectURI: content.text.redirectURI,
+      scope: content.text.scope,
     }, (data) => {
       this.setState({shareResult: JSON.stringify(data)})
     });
@@ -291,10 +294,10 @@ export default class WeiboSDK extends Component {
 
   shareImageToWeibo() {
     Weibo.shareImage({
-      text: "这里是一个微博文本分享的文本",
-      imagePath: resolveAssetSource(require('./jpg/tampon0.jpg')).uri,
-      redirectURI: "https://api.weibo.com/oauth2/default.html",
-      scope: "all",
+      text:content.image.text,
+      imagePath:content.image.imagePath,
+      redirectURI: content.image.redirectURI,
+      scope: content.image.scope,
     }, (data) => {
       this.setState({shareResult: JSON.stringify(data)})
     });
@@ -302,14 +305,14 @@ export default class WeiboSDK extends Component {
 
   shareWebPageToWeibo() {
     Weibo.shareWebPage({
-      text: "这里是一个微博网页分享的文本",
-      objectID: "identifier1",
-      title: "微博网页分享",
-      description: "这是一个微博网页分享的示例",
-      thumbnail: thumbnail,
-      webpageUrl: "http://sina.cn?a=1",
-      redirectURI: "https://api.weibo.com/oauth2/default.html",
-      scope: "all",
+      text: content.webPage.text,
+      objectID: content.webPage.objectID,
+      title: content.webPage.title,
+      description: content.webPage.description,
+      thumbnail: content.webPage.thumbnail,
+      webpageUrl: content.webPage.weiboWebUrl,
+      redirectURI: content.webPage.redirectURI,
+      scope: content.webPage.scope,
     }, (data) => {
       this.setState({shareResult: JSON.stringify(data)})
     });
@@ -317,15 +320,15 @@ export default class WeiboSDK extends Component {
 
   shareMusicToWeibo() {
     Weibo.shareMusic({
-      text: "这里是一个微博音乐分享的文本",
-      objectID: "identifier1",
-      title: "微博音乐分享",
-      description: "这是一个微博音乐分享的示例",
-      thumbnail: thumbnail,
-      musicUrl: "http://y.qq.com/#type=song&id=103347",
-      musicLowBandUrl: "http://stream20.qqmusic.qq.com/32464723.mp3",
-      redirectURI: "https://api.weibo.com/oauth2/default.html",
-      scope: "all",
+      text: content.music.text,
+      objectID: content.music.objectID,
+      title: content.music.title,
+      description: content.music.description,
+      thumbnail: content.music.thumbnail,
+      musicUrl: content.music.musicUrl,
+      musicLowBandUrl: content.music.musicLowBandUrl,
+      redirectURI: content.music.redirectURI,
+      scope: content.music.scope,
     }, (data) => {
       this.setState({shareResult: JSON.stringify(data)})
     });
@@ -333,14 +336,14 @@ export default class WeiboSDK extends Component {
 
   shareVideoToWeibo() {
     Weibo.shareVideo({
-      text: "这里是一个微博视频分享的文本",
-      objectID: "identifier1",
-      title: "微博视频分享",
-      description: "这是一个微博视频分享的示例",
-      thumbnail: thumbnail,
-      videoUrl: "http://v.youku.com/v_show/id_XNTUxNDY1NDY4.html",
-      redirectURI: "https://api.weibo.com/oauth2/default.html",
-      scope: "all",
+      text: content.video.text,
+      objectID: content.video.objectID,
+      title: content.video.title,
+      description: content.video.description,
+      thumbnail: content.video.thumbnail,
+      videoUrl: content.video.weiboVideoUri,
+      redirectURI: content.video.redirectURI,
+      scope: content.video.scope,
     }, (data) => {
       this.setState({shareResult: JSON.stringify(data)})
     });

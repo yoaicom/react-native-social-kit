@@ -8,6 +8,6 @@
   "dependencies": {
     "react": "15.2.0",
     "react-native": "^0.29.0",
-    "react-native-social-kit": "^0.0.7"
+    "react-native-social-kit": "0.0.9"
   }
 }

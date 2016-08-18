@@ -27,7 +27,8 @@ var styles = StyleSheet.create({
     margin: 3,
     width: 100,
     height: 55,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: '#90C76D',
+    borderColor: '#90C76D',
     alignItems: 'center',
     borderWidth: 1,
     // borderRadius: 5,
@@ -46,16 +47,16 @@ var styles = StyleSheet.create({
     fontSize: 20,
     textAlign: 'center',
     fontWeight: 'bold',
-    color:'green'
+    color:'#316532'
   },
   sectionHeader: {
     height: 30,
     justifyContent: 'center',
-    backgroundColor: '#CDD1C7',
+    backgroundColor: '#E5E5E5',
     borderTopWidth: 1/PixelRatio.get(),
-    borderTopColor: 'black',
+    borderTopColor: '#E5E5E5',
     borderBottomWidth: 1/PixelRatio.get(),
-    borderBottomColor: 'black'
+    borderBottomColor: '#E5E5E5'
   },
   thumb: {
     width: 64,
