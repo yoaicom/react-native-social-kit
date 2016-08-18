@@ -7,6 +7,7 @@ demo/
 # Xcode
 #
 build/
+Pods/
 *.pbxuser
 !default.pbxuser
 *.mode1v3
@@ -22,7 +23,8 @@ DerivedData
 *.hmap
 *.ipa
 *.xcuserstate
-project.xcworkspace
+Podfile.lock
+*.xcworkspace
 
 # Android/IJ
 #
