@@ -1,4 +1,4 @@
-package com.demo;
+package com.yoai.reactnative.demo;
 
 import com.facebook.react.ReactActivity;
 

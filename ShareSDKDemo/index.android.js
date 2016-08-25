@@ -10,11 +10,12 @@ import {
 } from 'react-native';
 
 import Demo from './Demo';
+import WeixinDemo from './js/WeixinDemo';
 
 class demo extends Component {
   render() {
     return (
-      <Demo/>
+      <WeixinDemo/>
     );
   }
 }

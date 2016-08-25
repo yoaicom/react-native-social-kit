@@ -1,3 +1,5 @@
 rootProject.name = 'Demo'
 
 include ':app'
+include ':react-native-social-kit'
+project(':react-native-social-kit').projectDir = new File(settingsDir, '../../android')
