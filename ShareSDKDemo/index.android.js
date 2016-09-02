@@ -11,11 +11,12 @@ import {
 
 import Demo from './Demo';
 import WeixinDemo from './js/WeixinDemo';
+import WeiboDemo from './js/WeiboDemo';
 
 class demo extends Component {
   render() {
     return (
-      <WeixinDemo/>
+      <WeiboDemo />
     );
   }
 }

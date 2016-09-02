@@ -128,8 +128,6 @@ public class WeixinModule extends ReactContextBaseJavaModule implements IWXAPIEv
       WXMediaMessage message = new WXMediaMessage();
       message.mediaObject = imageObject;
       message.thumbData = Utils.toByteArray(thumb(imageObject.imageData), true);
-      message.title = config.getString("title");
-      message.description = config.getString("description");
 
       SendMessageToWX.Req req = new SendMessageToWX.Req();
       req.transaction = buildTransaction("img");
