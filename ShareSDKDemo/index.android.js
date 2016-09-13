@@ -17,7 +17,7 @@ import QQDemo from './js/QQDemo';
 class demo extends Component {
   render() {
     return (
-      <QQDemo />
+      <WeiboDemo />
     );
   }
 }

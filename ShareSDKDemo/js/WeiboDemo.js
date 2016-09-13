@@ -42,23 +42,18 @@ export default class Demo extends Component {
     }, this.callback);
   }
 
-  shareText() {
-    Weibo.shareText({
-      text: 'Hello World, 你好!',
-      uri: 'http://static.yoaicdn.com/shoppc/images/cover_img_e1e9e6b.jpg@!yoai_img_middle'
-    }, this.callback);
-  }
-
   share() {
     Weibo.share({
       text: 'Hello World, 你好!',
-      image: 'http://static.yoaicdn.com/shoppc/images/cover_img_e1e9e6b.jpg@!yoai_img_middle',
-      webpage: {
+      //image: 'http://static.yoaicdn.com/shoppc/images/cover_img_e1e9e6b.jpg@!yoai_img_middle',
+      music: {
         title: '这是一个标题',
         description: '这是一个描述',
         thumb: 'http://tva4.sinaimg.cn/crop.0.0.180.180.50/6306d074jw1e8qgp5bmzyj2050050aa8.jpg',
-        url: 'http://www.weibo.com',
-        dataUrl: 'http://v.yoai.com/femme_tampon_tutorial.mp4',
+        url: 'http://www.yoai.com',
+        dataUrl: 'http://so1.111ttt.com:8282/2016/1/09/12/202121628190.mp3',
+        dataHdUrl: 'http://so1.111ttt.com:8282/2016/1/09/12/202121628190.mp3',
+        //dataUrl: 'http://v.yoai.com/femme_tampon_tutorial.mp4',
         duration: 100
       }
     }, this.callback);

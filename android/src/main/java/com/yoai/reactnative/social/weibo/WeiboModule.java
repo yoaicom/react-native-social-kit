@@ -80,7 +80,7 @@ public class WeiboModule extends ReactContextBaseJavaModule implements ActivityE
   @ReactMethod
   public void registerApp(final String appKey, final Callback callback) {
     this.appKey = appKey;
-    this.shareApi = WeiboShareSDK.createWeiboAPI(getReactApplicationContext(), appKey);
+    this.shareApi = WeiboShareSDK.createWeiboAPI(getReactApplicationContext().getApplicationContext(), appKey);
     boolean result = this.shareApi.registerApp();
     if (callback != null) {
       info("registerApp...weiboSupportApi=" + shareApi.getWeiboAppSupportAPI());
@@ -150,7 +150,6 @@ public class WeiboModule extends ReactContextBaseJavaModule implements ActivityE
         mediaObject.description = map.getString("description");
         mediaObject.thumbData = Utils.toByteArray(map.getString("thumb"));
         mediaObject.actionUrl = map.getString("url");
-        mediaObject.defaultText = "Webpage 默认文案";
 
         message.mediaObject = mediaObject;
       } else if (config.hasKey("music")) {
@@ -163,7 +162,9 @@ public class WeiboModule extends ReactContextBaseJavaModule implements ActivityE
 
         musicObject.actionUrl = map.getString("url");
         musicObject.dataUrl = map.getString("dataUrl");
+        musicObject.dataHdUrl = map.getString("dataHdUrl");
         musicObject.duration = map.getInt("duration");
+        musicObject.defaultText = "Music 默认文案";
 
         message.mediaObject = musicObject;
       } else if (config.hasKey("video")) {
@@ -185,7 +186,6 @@ public class WeiboModule extends ReactContextBaseJavaModule implements ActivityE
       request.transaction = buildTransaction(null);
       request.multiMessage = message;
 
-      info("share...getCurrentActivity=" + getCurrentActivity());
       shareApi.sendRequest(getCurrentActivity(), request);
     }
   }
@@ -199,14 +199,12 @@ public class WeiboModule extends ReactContextBaseJavaModule implements ActivityE
       if (config.hasKey("scope")) {
         scope = config.getString("scope");
       }
-
       String redirectUrl = "https://api.weibo.com/oauth2/default.html";
       if (config.hasKey("redirectUrl")) {
         redirectUrl = config.getString("redirectUrl");
       }
-
       AuthInfo authInfo = new AuthInfo(getCurrentActivity(), appKey, redirectUrl, scope);
-      this.ssoHandler = new SsoHandler(getCurrentActivity(), authInfo);
+      ssoHandler = new SsoHandler(getCurrentActivity(), authInfo);
 
       WeiboAuthListener authListener = new WeiboAuthListener() {
 
@@ -260,7 +258,6 @@ public class WeiboModule extends ReactContextBaseJavaModule implements ActivityE
       };
 
       this.ssoHandler.authorize(authListener);
-//      this.ssoHandler.registerOrLoginByMobile("", authListener);
     }
   }
 
