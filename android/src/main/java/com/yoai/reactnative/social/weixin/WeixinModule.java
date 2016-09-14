@@ -37,9 +37,7 @@ public class WeixinModule extends ReactContextBaseJavaModule implements IWXAPIEv
   private static final String TAG = "WeixinModule";
 
   private IWXAPI api;
-
   private String authStateString;
-
   private Callback authCallback;
   private Callback shareCallback;
   private Callback payCallback;
@@ -88,177 +86,62 @@ public class WeixinModule extends ReactContextBaseJavaModule implements IWXAPIEv
   }
 
   @ReactMethod
-  public void shareText(final ReadableMap config, final Callback callback) {
-    info("shareText...");
-
+  public void share(final ReadableMap config, final Callback callback) {
+    info("share...");
     if (config != null && api != null) {
       this.shareCallback = callback;
 
-      String text = config.getString("text");
-      WXTextObject textObject = new WXTextObject();
-      textObject.text = text;
+      final SendMessageToWX.Req req = new SendMessageToWX.Req();
+      String scene = "session";
+      if (config.hasKey("scene")) {
+        scene = config.getString("scene");
+      }
+      req.scene = parseScene(scene);
 
-      WXMediaMessage message = new WXMediaMessage();
-      message.mediaObject = textObject;
-      message.description = text;
-
-
-      SendMessageToWX.Req req = new SendMessageToWX.Req();
-      req.transaction = buildTransaction("text");
+      final WXMediaMessage message = new WXMediaMessage();
       req.message = message;
-      req.scene = parseScene(config.getString("scene"));
+      if (config.hasKey("title")) {
+        message.title = config.getString("title");
+      }
+      if (config.hasKey("description")) {
+        message.description = config.getString("description");
+      }
+      if (config.hasKey("thumb")) {
+        message.thumbData = thumbData(Utils.toByteArray(config.getString("thumb")));
+      }
 
-      api.sendReq(req);
-    }
-  }
-
-  @ReactMethod
-  public void shareImage(final ReadableMap config, final Callback callback) {
-    info("shareImage...");
-
-    if (config != null && api != null) {
-      this.shareCallback = callback;
-
-      String uri = config.getString("uri");
-      info("shareImage...uri=" + uri);
-
-      WXImageObject imageObject = new WXImageObject();
-      imageObject.imageData = Utils.toByteArray(uri);
-
-      WXMediaMessage message = new WXMediaMessage();
-      message.mediaObject = imageObject;
-      message.thumbData = Utils.toByteArray(thumb(imageObject.imageData), true);
-
-      SendMessageToWX.Req req = new SendMessageToWX.Req();
-      req.transaction = buildTransaction("img");
-      req.message = message;
-      req.scene = parseScene(config.getString("scene"));
-
-      api.sendReq(req);
-    }
-  }
-
-  @ReactMethod
-  public void shareMusic(final ReadableMap config, final Callback callback) {
-    info("shareMusic...");
-
-    if (config != null && api != null) {
-      this.shareCallback = callback;
-
-      WXMusicObject musicObject = new WXMusicObject();
-      musicObject.musicUrl = config.getString("uri");
-
-      WXMediaMessage message = new WXMediaMessage();
-      message.mediaObject = musicObject;
-      message.title = config.getString("title");
-      message.description = config.getString("description");
-      message.thumbData = Utils.toByteArray(config.getString("thumb"));
-
-      SendMessageToWX.Req req = new SendMessageToWX.Req();
-      req.transaction = buildTransaction("music");
-      req.message = message;
-      req.scene = parseScene(config.getString("scene"));
-
-      api.sendReq(req);
-    }
-  }
-
-  @ReactMethod
-  public void shareVideo(final ReadableMap config, final Callback callback) {
-    info("shareVideo...");
-
-    if (config != null && api != null) {
-      this.shareCallback = callback;
-
-      WXVideoObject videoObject = new WXVideoObject();
-      videoObject.videoUrl = config.getString("uri");
-
-      WXMediaMessage message = new WXMediaMessage();
-      message.mediaObject = videoObject;
-      message.title = config.getString("title");
-      message.description = config.getString("description");
-      message.thumbData = Utils.toByteArray(config.getString("thumb"));
-
-      SendMessageToWX.Req req = new SendMessageToWX.Req();
-      req.transaction = buildTransaction("video");
-      req.message = message;
-      req.scene = parseScene(config.getString("scene"));
-
-      api.sendReq(req);
-    }
-  }
-
-  @ReactMethod
-  public void shareWebpage(final ReadableMap config, final Callback callback) {
-    info("shareWebpage...");
-
-    if (config != null && api != null) {
-      this.shareCallback = callback;
-
-      WXWebpageObject webpageObject = new WXWebpageObject();
-      webpageObject.webpageUrl = config.getString("uri");
-
-      WXMediaMessage message = new WXMediaMessage();
-      message.mediaObject = webpageObject;
-      message.title = config.getString("title");
-      message.description = config.getString("description");
-      message.thumbData = Utils.toByteArray(config.getString("thumb"));
-
-      SendMessageToWX.Req req = new SendMessageToWX.Req();
-      req.transaction = buildTransaction("webpage");
-      req.message = message;
-      req.scene = parseScene(config.getString("scene"));
-
-      api.sendReq(req);
-    }
-  }
-
-  @ReactMethod
-  public void shareAppData(final ReadableMap config, final Callback callback) {
-    info("shareAppData");
-
-    if (config != null && api != null) {
-      this.shareCallback = callback;
-
-      WXAppExtendObject appExtendObject = new WXAppExtendObject();
-      appExtendObject.extInfo = config.getString("extra");
-
-      WXMediaMessage message = new WXMediaMessage();
-      message.mediaObject = appExtendObject;
-      message.title = config.getString("title");
-      message.description = config.getString("description");
-      message.thumbData = Utils.toByteArray(config.getString("thumb"));
-
-      SendMessageToWX.Req req = new SendMessageToWX.Req();
-      req.transaction = buildTransaction("appdata");
-      req.message = message;
-      req.scene = parseScene(config.getString("scene"));
-
-      api.sendReq(req);
-    }
-  }
-
-  @ReactMethod
-  public void shareEmoticon(final ReadableMap config, final Callback callback) {
-    info("shareEmoticon");
-
-    if (config != null && api != null) {
-      this.shareCallback = callback;
-
-      WXEmojiObject emojiObject = new WXEmojiObject();
-      emojiObject.emojiData = Utils.toByteArray(config.getString("uri"));
-
-
-      WXMediaMessage message = new WXMediaMessage();
-      message.mediaObject = emojiObject;
-      message.title = config.getString("title");
-      message.description = config.getString("description");
-      message.thumbData = Utils.toByteArray(thumb(emojiObject.emojiData), true);
-
-      SendMessageToWX.Req req = new SendMessageToWX.Req();
-      req.transaction = buildTransaction("emoticon");
-      req.message = message;
-      req.scene = parseScene(config.getString("scene"));
+      if (config.hasKey("text")) { //分享文字
+        String text = config.getString("text");
+        message.mediaObject = new WXTextObject(text);
+        message.description = text;
+        req.transaction = buildTransaction("text");
+      } else if (config.hasKey("image")) { //分享图片
+        String uri = config.getString("image");
+        byte[] imageData = Utils.toByteArray(uri);
+        message.mediaObject = new WXImageObject(imageData);
+        message.thumbData = thumbData(imageData);
+        req.transaction = buildTransaction("img");
+      } else if (config.hasKey("music")) { //分享音乐
+        String url = config.getString("music");
+        WXMusicObject musicObject = new WXMusicObject();
+        musicObject.musicUrl = url;
+        if (config.hasKey("data")) {
+          musicObject.musicDataUrl = config.getString("data");
+        }
+        message.mediaObject = musicObject;
+        req.transaction = buildTransaction("music");
+      } else if (config.hasKey("video")) { //分享视频
+        String url = config.getString("video");
+        WXVideoObject videoObject = new WXVideoObject();
+        videoObject.videoUrl = url;
+        message.mediaObject = videoObject;
+        req.transaction = buildTransaction("video");
+      } else if (config.hasKey("webpage")) { //分享网页
+        String url = config.getString("webpage");
+        WXWebpageObject webpageObject = new WXWebpageObject();
+        webpageObject.webpageUrl = url;
+        message.mediaObject = webpageObject;
+      }
 
       api.sendReq(req);
     }
@@ -304,14 +187,21 @@ public class WeixinModule extends ReactContextBaseJavaModule implements IWXAPIEv
     return null;
   }
 
+  private static byte[] thumbData(byte[] imageData) {
+    Bitmap thumb = thumb(imageData);
+    return Utils.toByteArray(thumb, true);
+  }
+
   private static int parseScene(String scene) {
+    int ret = SendMessageToWX.Req.WXSceneSession;
     if ("timeline".equals(scene)) {
-      return SendMessageToWX.Req.WXSceneTimeline;
+      ret = SendMessageToWX.Req.WXSceneTimeline;
     } else if ("favorite".equals(scene)) {
-      return SendMessageToWX.Req.WXSceneFavorite;
-    } else {
-      return SendMessageToWX.Req.WXSceneSession;
+      ret = SendMessageToWX.Req.WXSceneFavorite;
+    } else if ("session".equals(scene)) {
+      ret = SendMessageToWX.Req.WXSceneSession;
     }
+    return ret;
   }
 
   @ReactMethod

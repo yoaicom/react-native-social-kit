@@ -1,17 +1,13 @@
 'use strict';
 
 import React, {Component} from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  Alert
-} from 'react-native';
+import {View, Text, TouchableOpacity, Alert} from 'react-native';
 
 import {Weixin} from 'react-native-social-kit';
 
-export default class Demo extends Component {
+import resolveAssetSource from 'resolveAssetSource';
 
+export default class Demo extends Component {
 
   componentDidMount() {
     Weixin.registerApp('wx1dd0b08688eecaef', this.callback);
@@ -57,18 +53,6 @@ export default class Demo extends Component {
         </TouchableOpacity>
 
         <TouchableOpacity
-          onPress={this.shareAppData.bind(this)}
-          style={{height: 50, alignItems: 'center', justifyContent: 'center'}}>
-          <Text>应用数据分享[Android不可用]</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          onPress={this.shareEmoticon.bind(this)}
-          style={{height: 50, alignItems: 'center', justifyContent: 'center'}}>
-          <Text>表情分享</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
           onPress={this.pay.bind(this)}
           style={{height: 50, alignItems: 'center', justifyContent: 'center'}}>
           <Text>支付</Text>
@@ -84,66 +68,49 @@ export default class Demo extends Component {
   }
 
   shareText() {
-    Weixin.shareText({
+    Weixin.share({
       text: 'Hello World, 你好!',
-      scene: 'session'
+      //scene: 'session'
+      //scene: 'favorite'
+      //scene: 'timeline'
     }, this.callback);
   }
 
   shareImage() {
-    Weixin.shareImage({
-      source: require('./image/tampon.png'),
+    Weixin.share({
+      image: resolveAssetSource(require('./image/femme.jpg')).uri,
       scene: 'session'
     }, this.callback);
   }
 
   shareMusic() {
-    Weixin.shareMusic({
-      uri: 'http://119.90.25.30/dl.stream.qqmusic.qq.com/C200002e3gdm3c1o7j.m4a?vkey=18149AA33964202429C0793E60CF63892F98E363F0F2C5109C5A2C898BC9E2500F9ECB2AE6F98B5D9E46969114C322F1E2F6B9ADBDE672B9&guid=3683863747&fromtag=30',
+    Weixin.share({
+      music: 'http://www.baidu.com',
+      data: 'http://so1.111ttt.com:8282/2016/1/09/12/202121628190.mp3',
       title: 'Take Me Back',
       description: 'Christopher / Matom',
       scene: 'session',
-      thumb: 'http://y.gtimg.cn/music/photo_new/T002R300x300M000001XhYUk0mBpQf.jpg?max_age=2592000'
+      thumb: 'http://y.gtimg.cn/music/photo_new/T002R300x300M000001XhYUk0mBpQf.jpg'
     }, this.callback);
   }
 
   shareVideo() {
-    Weixin.shareVideo({
-      uri: 'http://v.yoai.com/femme_tampon_tutorial.mp4',
+    Weixin.share({
+      video: 'http://v.yoai.com/femme_tampon_tutorial.mp4',
       title: '非秘棉条使用教学',
       description: '90秒学会',
       scene: 'session',
-      thumb: 'http://static.yoaicdn.com/shoppc/images/cover_img_e1e9e6b.jpg@!yoai_img_middle'
+      thumb: 'http://static.yoaicdn.com/shoppc/images/cover_img_e1e9e6b.jpg'
     }, this.callback);
   }
 
   shareWebpage() {
-    Weixin.shareWebpage({
-      uri: 'http://www.yoai.com',
+    Weixin.share({
+      webpage: 'http://www.yoai.com',
       title: '有爱商城',
       description: '一家着眼于日常生活的科技公司',
       scene: 'session',
-      thumb: 'http://static.yoaicdn.com/shoppc/images/nv_9dabc07.png@!yoai_img_max'
-    }, this.callback);
-  }
-
-  shareAppData() {
-    Weixin.shareAppData({
-      extra: 'this is extra',
-      title: '有爱商城',
-      description: '一家着眼于日常生活的科技公司',
-      scene: 'session',
-      thumb: 'http://static.yoaicdn.com/shoppc/images/nv_9dabc07.png@!yoai_img_max'
-    }, this.callback);
-  }
-
-  shareEmoticon() {
-    Weixin.shareEmoticon({
-      //uri: 'http://ww3.sinaimg.cn/mw690/40411806gw1f75ynyujgyj20g409276p.jpg',
-      uri: 'http://192.168.100.18:3000/images/1.gif',
-      title: '有爱商城',
-      description: '一家着眼于日常生活的科技公司',
-      scene: 'session',
+      thumb: 'http://static.yoaicdn.com/shoppc/images/banner5_9005f94.jpg@!yoai_img_middle'
     }, this.callback);
   }
 
