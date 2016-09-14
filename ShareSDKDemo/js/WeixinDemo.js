@@ -78,7 +78,7 @@ export default class Demo extends Component {
 
   shareImage() {
     Weixin.share({
-      image: resolveAssetSource(require('./image/femme.jpg')).uri,
+      image: "file://" +resolveAssetSource(require('./image/femme.jpg')).uri,
       scene: 'session'
     }, this.callback);
   }
