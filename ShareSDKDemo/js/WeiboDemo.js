@@ -32,6 +32,12 @@ export default class Demo extends Component {
           <Text>分享</Text>
         </TouchableOpacity>
 
+        <TouchableOpacity
+          onPress={this.openWeiboApp.bind(this)}
+          style={{height: 50, alignItems: 'center', justifyContent: 'center'}}>
+          <Text>打开微博</Text>
+        </TouchableOpacity>
+
       </View>
     );
   }
@@ -46,17 +52,18 @@ export default class Demo extends Component {
     Weibo.share({
       text: 'Hello World, 你好!',
       //image: 'http://static.yoaicdn.com/shoppc/images/cover_img_e1e9e6b.jpg@!yoai_img_middle',
-      music: {
-        title: '这是一个标题',
-        description: '这是一个描述',
-        thumb: 'http://tva4.sinaimg.cn/crop.0.0.180.180.50/6306d074jw1e8qgp5bmzyj2050050aa8.jpg',
-        url: 'http://www.yoai.com',
-        dataUrl: 'http://so1.111ttt.com:8282/2016/1/09/12/202121628190.mp3',
-        dataHdUrl: 'http://so1.111ttt.com:8282/2016/1/09/12/202121628190.mp3',
-        //dataUrl: 'http://v.yoai.com/femme_tampon_tutorial.mp4',
-        duration: 100
-      }
+      video: 'http://www.yoai.com/know_tampons.html',
+      title: '这是一个标题',
+      description: '这是一个描述',
+      thumb: 'http://tva4.sinaimg.cn/crop.0.0.180.180.50/6306d074jw1e8qgp5bmzyj2050050aa8.jpg',
+      //data: 'http://so1.111ttt.com:8282/2016/1/09/12/202121628190.mp3',
+      data: 'http://v.yoai.com/femme_tampon_tutorial.mp4',
+      duration: 100
     }, this.callback);
+  }
+
+  openWeiboApp() {
+    Weibo.openWeiboApp(this.callback);
   }
 
 

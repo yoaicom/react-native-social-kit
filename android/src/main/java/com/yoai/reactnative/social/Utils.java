@@ -1,8 +1,11 @@
 package com.yoai.reactnative.social;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.util.Log;
+
+import com.tencent.mm.sdk.modelmsg.WXMediaMessage;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
@@ -18,6 +21,26 @@ public class Utils {
     if (DEBUG) {
       Log.i(tag, msg);
     }
+  }
+
+  public static Bitmap bitmap(String uri) {
+    byte[] imageData = toByteArray(uri);
+    if (imageData != null) {
+      Bitmap bitmap = BitmapFactory.decodeByteArray(imageData, 0, imageData.length);
+      return bitmap;
+    }
+    return null;
+  }
+
+  public static Bitmap thumb(Bitmap bmp, int maxLength) {
+    if (bmp != null) {
+      int scale = (int) Math.ceil(Math.sqrt(bmp.getWidth() * bmp.getHeight() * 1f / maxLength));
+      if (scale <= 1) {
+        return bmp;
+      }
+      return Bitmap.createScaledBitmap(bmp, bmp.getWidth() / scale, bmp.getHeight() / scale, true);
+    }
+    return null;
   }
 
   public static byte[] toByteArray(final Bitmap bmp, boolean recycle) {

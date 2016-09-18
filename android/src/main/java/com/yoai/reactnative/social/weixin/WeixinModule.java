@@ -86,6 +86,24 @@ public class WeixinModule extends ReactContextBaseJavaModule implements IWXAPIEv
   }
 
   @ReactMethod
+  public void authorize(final ReadableMap config, final Callback callback) {
+    info("authorize...");
+
+    if (api != null) {
+      this.authCallback = callback;
+
+      // 微信官网文档：用于保持请求和回调的状态，授权请求后原样带回给第三方。该参数可用于防止csrf攻击（跨站请求伪造攻击），建议第三方带上该参数，可设置为简单的随机数加session进行校验.
+      this.authStateString = UUID.randomUUID().toString();
+
+      final SendAuth.Req req = new SendAuth.Req();
+      req.scope = "snsapi_userinfo"; //微信授权登录只能使用"snsapi_userinfo"
+      req.state = this.authStateString;
+      api.sendReq(req);
+    }
+  }
+
+
+  @ReactMethod
   public void share(final ReadableMap config, final Callback callback) {
     info("share...");
     if (config != null && api != null) {
@@ -202,23 +220,6 @@ public class WeixinModule extends ReactContextBaseJavaModule implements IWXAPIEv
       ret = SendMessageToWX.Req.WXSceneSession;
     }
     return ret;
-  }
-
-  @ReactMethod
-  public void authorize(final ReadableMap config, final Callback callback) {
-    info("authorize...");
-
-    if (api != null) {
-      this.authCallback = callback;
-
-      // 微信官网文档：用于保持请求和回调的状态，授权请求后原样带回给第三方。该参数可用于防止csrf攻击（跨站请求伪造攻击），建议第三方带上该参数，可设置为简单的随机数加session进行校验.
-      this.authStateString = UUID.randomUUID().toString();
-
-      final SendAuth.Req req = new SendAuth.Req();
-      req.scope = "snsapi_userinfo"; //微信授权登录只能使用"snsapi_userinfo"
-      req.state = this.authStateString;
-      api.sendReq(req);
-    }
   }
 
   public static void handleIntent(Intent intent) {

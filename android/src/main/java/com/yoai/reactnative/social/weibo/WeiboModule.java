@@ -13,6 +13,7 @@ import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeMap;
+import com.sina.weibo.sdk.api.BaseMediaObject;
 import com.sina.weibo.sdk.api.ImageObject;
 import com.sina.weibo.sdk.api.MusicObject;
 import com.sina.weibo.sdk.api.TextObject;
@@ -32,6 +33,8 @@ import com.sina.weibo.sdk.constant.WBConstants;
 import com.sina.weibo.sdk.exception.WeiboException;
 import com.sina.weibo.sdk.utils.Utility;
 import com.yoai.reactnative.social.Utils;
+
+import static com.yoai.reactnative.social.Utils.*;
 
 public class WeiboModule extends ReactContextBaseJavaModule implements ActivityEventListener {
 
@@ -78,6 +81,17 @@ public class WeiboModule extends ReactContextBaseJavaModule implements ActivityE
   }
 
   @ReactMethod
+  public void openWeiboApp(final Callback callback) {
+    boolean result = false;
+    if (shareApi != null) {
+      result = shareApi.launchWeibo(getCurrentActivity());
+    }
+    if (callback != null) {
+      callback.invoke(result);
+    }
+  }
+
+  @ReactMethod
   public void registerApp(final String appKey, final Callback callback) {
     this.appKey = appKey;
     this.shareApi = WeiboShareSDK.createWeiboAPI(getReactApplicationContext().getApplicationContext(), appKey);
@@ -90,103 +104,6 @@ public class WeiboModule extends ReactContextBaseJavaModule implements ActivityE
       writableMap.putBoolean("weiboAppInstalled", shareApi.isWeiboAppInstalled());
       writableMap.putBoolean("apiSupported", shareApi.isWeiboAppSupportAPI());
       callback.invoke(writableMap);
-    }
-  }
-
-  @ReactMethod
-  public void shareText(final ReadableMap config, final Callback callback) {
-    info("shareText...");
-
-    if (config != null && shareApi != null) {
-      this.shareCallback = callback;
-
-      String text = config.getString("text");
-      TextObject textObject = new TextObject();
-      textObject.text = text;
-
-      String uri = config.getString("uri");
-      ImageObject imageObject = new ImageObject();
-      imageObject.imageData = Utils.toByteArray(uri);
-
-      WeiboMultiMessage message = new WeiboMultiMessage();
-      message.textObject = textObject;
-      message.imageObject = imageObject;
-
-      SendMultiMessageToWeiboRequest request = new SendMultiMessageToWeiboRequest();
-      request.transaction = buildTransaction("text");
-      request.multiMessage = message;
-      shareApi.sendRequest(getCurrentActivity(), request);
-    }
-  }
-
-  @ReactMethod
-  public void share(final ReadableMap config, final Callback callback) {
-    info("share...");
-
-    if (config != null && shareApi != null) {
-      this.shareCallback = callback;
-
-      WeiboMultiMessage message = new WeiboMultiMessage();
-
-      if (config.hasKey("text")) {
-        String text = config.getString("text");
-        TextObject textObject = new TextObject();
-        textObject.text = text;
-        message.textObject = textObject;
-      }
-
-      if (config.hasKey("image")) {
-        String image = config.getString("image");
-        ImageObject imageObject = new ImageObject();
-        imageObject.imageData = Utils.toByteArray(image);
-        message.imageObject = imageObject;
-      }
-
-      if (config.hasKey("webpage")) {
-        ReadableMap map = config.getMap("webpage");
-        WebpageObject mediaObject = new WebpageObject();
-        mediaObject.identify = Utility.generateGUID();
-        mediaObject.title = map.getString("title");
-        mediaObject.description = map.getString("description");
-        mediaObject.thumbData = Utils.toByteArray(map.getString("thumb"));
-        mediaObject.actionUrl = map.getString("url");
-
-        message.mediaObject = mediaObject;
-      } else if (config.hasKey("music")) {
-        ReadableMap map = config.getMap("music");
-        MusicObject musicObject = new MusicObject();
-        musicObject.identify = Utility.generateGUID();
-        musicObject.title = map.getString("title");
-        musicObject.description = map.getString("description");
-        musicObject.thumbData = Utils.toByteArray(map.getString("thumb"));
-
-        musicObject.actionUrl = map.getString("url");
-        musicObject.dataUrl = map.getString("dataUrl");
-        musicObject.dataHdUrl = map.getString("dataHdUrl");
-        musicObject.duration = map.getInt("duration");
-        musicObject.defaultText = "Music 默认文案";
-
-        message.mediaObject = musicObject;
-      } else if (config.hasKey("video")) {
-        ReadableMap map = config.getMap("video");
-        VideoObject videoObject = new VideoObject();
-        videoObject.identify = Utility.generateGUID();
-        videoObject.title = map.getString("title");
-        videoObject.description = map.getString("description");
-        videoObject.thumbData = Utils.toByteArray(map.getString("thumb"));
-        videoObject.actionUrl = map.getString("url");
-        videoObject.dataUrl = map.getString("dataUrl");
-        videoObject.duration = map.getInt("duration");
-        videoObject.defaultText = "Vedio 默认文案";
-
-        message.mediaObject = videoObject;
-      }
-
-      SendMultiMessageToWeiboRequest request = new SendMultiMessageToWeiboRequest();
-      request.transaction = buildTransaction(null);
-      request.multiMessage = message;
-
-      shareApi.sendRequest(getCurrentActivity(), request);
     }
   }
 
@@ -258,6 +175,77 @@ public class WeiboModule extends ReactContextBaseJavaModule implements ActivityE
       };
 
       this.ssoHandler.authorize(authListener);
+    }
+  }
+
+  @ReactMethod
+  public void share(final ReadableMap config, final Callback callback) {
+    info("share...");
+
+    if (config != null && shareApi != null) {
+      this.shareCallback = callback;
+
+      WeiboMultiMessage message = new WeiboMultiMessage();
+
+      if (config.hasKey("text")) {
+        String text = config.getString("text");
+        TextObject textObject = new TextObject();
+        textObject.text = text;
+        message.textObject = textObject;
+      }
+
+      if (config.hasKey("image")) {
+        String image = config.getString("image");
+        ImageObject imageObject = new ImageObject();
+        imageObject.imageData = Utils.toByteArray(image);
+        message.imageObject = imageObject;
+      }
+
+      if (config.hasKey("webpage")) {
+        WebpageObject mediaObject = new WebpageObject();
+        parseCommon(config, mediaObject);
+        mediaObject.identify = Utility.generateGUID();
+        mediaObject.actionUrl = config.getString("webpage");
+        message.mediaObject = mediaObject;
+      } else if (config.hasKey("music")) {
+        MusicObject musicObject = new MusicObject();
+        parseCommon(config, musicObject);
+        musicObject.identify = Utility.generateGUID();
+        musicObject.actionUrl = config.getString("music");
+        if (config.hasKey("data")) {
+          musicObject.dataUrl = config.getString("data");
+        }
+        musicObject.duration = config.getInt("duration");
+        message.mediaObject = musicObject;
+      } else if (config.hasKey("video")) {
+        VideoObject videoObject = new VideoObject();
+        parseCommon(config, videoObject);
+        videoObject.identify = Utility.generateGUID();
+        videoObject.actionUrl = config.getString("video");
+        if (config.hasKey("data")) {
+          videoObject.dataUrl = config.getString("data");
+        }
+        videoObject.duration = config.getInt("duration");
+        message.mediaObject = videoObject;
+      }
+
+      SendMultiMessageToWeiboRequest request = new SendMultiMessageToWeiboRequest();
+      request.transaction = buildTransaction(null);
+      request.multiMessage = message;
+
+      shareApi.sendRequest(getCurrentActivity(), request);
+    }
+  }
+
+  private void parseCommon(ReadableMap config, BaseMediaObject mediaObject) {
+    if (config.hasKey("title")) {
+      mediaObject.title = config.getString("title");
+    }
+    if (config.hasKey("description")) {
+      mediaObject.description = config.getString("description");
+    }
+    if (config.hasKey("thumb")) {
+      mediaObject.thumbData = toByteArray(thumb(bitmap(config.getString("thumb")), 32768), true);
     }
   }
 
