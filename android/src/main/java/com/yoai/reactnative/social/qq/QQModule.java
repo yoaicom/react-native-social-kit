@@ -34,7 +34,6 @@ public class QQModule extends ReactContextBaseJavaModule implements ActivityEven
 
     // Do we need to remove the listener later?
     reactContext.addActivityEventListener(this);
-
   }
 
   @Override
@@ -94,24 +93,15 @@ public class QQModule extends ReactContextBaseJavaModule implements ActivityEven
       if (config.hasKey("description")) {
         params.putString(QQShare.SHARE_TO_QQ_SUMMARY, config.getString("description"));
       }
-      if (config.hasKey("url")) {
-        params.putString(QzoneShare.SHARE_TO_QQ_TARGET_URL, config.getString("url"));
-      }
       if (config.hasKey("thumb")) {
         params.putString(QQShare.SHARE_TO_QQ_IMAGE_URL, config.getString("thumb"));
       }
 
       boolean shareToFriends = true;
-      if (config.hasKey("image")) {
-        // 分享单张图片
-        params.putInt(QQShare.SHARE_TO_QQ_KEY_TYPE, QQShare.SHARE_TO_QQ_TYPE_IMAGE);
-        params.putString(QQShare.SHARE_TO_QQ_IMAGE_LOCAL_URL, config.getString("image"));
-      } else if (config.hasKey("audio")) {
-        // 分享音乐
-        params.putInt(QQShare.SHARE_TO_QQ_KEY_TYPE, QQShare.SHARE_TO_QQ_TYPE_AUDIO);
-        params.putString(QQShare.SHARE_TO_QQ_AUDIO_URL, config.getString("audio"));
+      if (config.hasKey("webpage")) {
+        params.putInt(QQShare.SHARE_TO_QQ_KEY_TYPE, QQShare.SHARE_TO_QQ_TYPE_DEFAULT);
+        params.putString(QzoneShare.SHARE_TO_QQ_TARGET_URL, config.getString("webpage"));
 
-      } else {
         if (config.hasKey("scene") && "qzone".equalsIgnoreCase(config.getString("scene"))) {
           shareToFriends = false; // 分享到QQ空间
           params.putInt(QzoneShare.SHARE_TO_QZONE_KEY_TYPE, QzoneShare.SHARE_TO_QZONE_TYPE_IMAGE_TEXT);
@@ -121,9 +111,16 @@ public class QQModule extends ReactContextBaseJavaModule implements ActivityEven
             arrayList.add(config.getString("thumb"));
             params.putStringArrayList(QzoneShare.SHARE_TO_QQ_IMAGE_URL, arrayList);
           }
-        } else {
-          params.putInt(QQShare.SHARE_TO_QQ_KEY_TYPE, QQShare.SHARE_TO_QQ_TYPE_DEFAULT);
         }
+      } else if (config.hasKey("image")) {
+        // 分享单张图片
+        params.putInt(QQShare.SHARE_TO_QQ_KEY_TYPE, QQShare.SHARE_TO_QQ_TYPE_IMAGE);
+        params.putString(QQShare.SHARE_TO_QQ_IMAGE_LOCAL_URL, config.getString("image"));
+      } else if (config.hasKey("music")) {
+        // 分享音乐
+        params.putInt(QQShare.SHARE_TO_QQ_KEY_TYPE, QQShare.SHARE_TO_QQ_TYPE_AUDIO);
+        params.putString(QzoneShare.SHARE_TO_QQ_TARGET_URL, config.getString("music"));
+        params.putString(QQShare.SHARE_TO_QQ_AUDIO_URL, config.getString("data"));
       }
 
       if (shareToFriends) {
