@@ -6,7 +6,7 @@
 static RCTResponseSenderBlock authCallback;
 static RCTResponseSenderBlock shareCallback;
 static RCTResponseSenderBlock payCallback;
-static RCTResponseSenderBlock payResultCallback;
+
 static NSString *authStateString;
 
 @implementation WeixinModule
@@ -39,13 +39,13 @@ RCT_EXPORT_METHOD(registerApp
   }
 }
 
-#pragma mark - 开发微信
+#pragma mark - 打开微信
 
 RCT_EXPORT_METHOD(openWeixinApp : (RCTResponseSenderBlock)callback) {
-
+  
   NSDictionary *result = [NSDictionary
-      dictionaryWithObject:[NSNumber numberWithBool:[WXApi openWXApp]]
-                    forKey:@"appOpened"];
+                          dictionaryWithObject:[NSNumber numberWithBool:[WXApi openWXApp]]
+                          forKey:@"appOpened"];
   callback(@[ result ]);
 }
 #pragma mark - 分享
@@ -55,18 +55,18 @@ RCT_EXPORT_METHOD(share
                   : (RCTResponseSenderBlock)callback) {
   if (config != nil) {
     shareCallback = callback;
-
+    
     int scene = [self judgeSceneTypeWithConfig:config];
-
+    
     SendMessageToWXReq *req = [[SendMessageToWXReq alloc] init];
     req.bText = NO;
     req.scene = scene;
-
+    
     if ([config objectForKey:@"text"]) {
       req.text = [config objectForKey:@"text"];
       req.bText = YES;
       [WXApi sendReq:req];
-
+      
     } else {
       WXMediaMessage *message = [self getMessageWithConfig:config];
       req.bText = NO;
@@ -75,34 +75,36 @@ RCT_EXPORT_METHOD(share
       if ([config objectForKey:@"image"]) {
         WXImageObject *imageObject = [WXImageObject object];
         thumbImage = [config objectForKey:@"image"];
-        [self getImgaeWithUrl:[config objectForKey:@"image"] andCompletionBlock:^(NSError *error, UIImage *image) {
-          dispatch_async(dispatch_get_main_queue(), ^{
-            imageObject.imageData = UIImageJPEGRepresentation(image, 1);
-            message.mediaObject = imageObject;
-          });
-        }];
-
+        if ([[thumbImage substringToIndex:1] isEqualToString:@"/"]) {
+          imageObject.imageData = [NSData dataWithContentsOfFile:thumbImage];
+          thumbImage = [NSString stringWithFormat:@"file://%@",thumbImage];
+        } else {
+          NSLog(@"thumbImage = %@",thumbImage);
+          imageObject.imageData = [NSData dataWithContentsOfURL:[NSURL URLWithString:thumbImage]];
+        }
+        message.mediaObject = imageObject;
       } else if ([config objectForKey:@"music"]) {
-
+        
         WXMusicObject *musicObject = [WXMusicObject object];
         musicObject.musicUrl = [config objectForKey:@"music"];
         musicObject.musicDataUrl = [config objectForKey:@"data"];
         message.mediaObject = musicObject;
-
+        
       } else if ([config objectForKey:@"video"]) {
-
+        
         WXVideoObject *videoObject = [WXVideoObject object];
         videoObject.videoUrl = [config objectForKey:@"video"];
         message.mediaObject = videoObject;
-
+        
       } else if ([config objectForKey:@"webpage"]) {
-
+        
         WXWebpageObject *webpageObject = [WXWebpageObject object];
         webpageObject.webpageUrl = [config objectForKey:@"webpage"];
         message.mediaObject = webpageObject;
       }
-      if (thumbImage.length > 0) {
+      if (thumbImage && thumbImage.length > 0) {
         NSLog(@"设置缩略图");
+        
         [self getImgaeWithUrl:thumbImage andCompletionBlock:^(NSError *error, UIImage *image) {
           NSData *imageData = UIImageJPEGRepresentation(image, 1.0);
           UIImage *resultImage = [UIImage imageWithData:imageData];
@@ -132,17 +134,15 @@ RCT_EXPORT_METHOD(share
 
 RCT_EXPORT_METHOD(pay
                   : (NSDictionary *)config
-                  : (RCTResponseSenderBlock)callback
-                  : (RCTResponseSenderBlock)resultCallback) {
-
+                  : (RCTResponseSenderBlock)callback) {
+  
   payCallback = callback;
-  payResultCallback = resultCallback;
-
+  
   if (config != nil) {
     NSMutableString *retcode = [config objectForKey:@"retcode"];
     if (retcode.intValue == 0) {
       NSMutableString *stamp = [config objectForKey:@"timestamp"];
-
+      
       //调起微信支付
       PayReq *req = [[PayReq alloc] init];
       req.partnerId = [config objectForKey:@"partnerid"];
@@ -152,15 +152,15 @@ RCT_EXPORT_METHOD(pay
       req.package = [config objectForKey:@"package"];
       req.sign = [config objectForKey:@"sign"];
       [WXApi sendReq:req];
-
+      
       //日志输出
       NSString *configInfo = [NSString
-          stringWithFormat:
-              @"appid=%@\npartid=%@\nprepayid=%@\nnoncestr=%@\ntimestamp=%"
-              @"ld\npackage=%@\nsign=%@",
-              [config objectForKey:@"appid"], req.partnerId, req.prepayId,
-              req.nonceStr, (long)req.timeStamp, req.package, req.sign];
-
+                              stringWithFormat:
+                              @"appid=%@\npartid=%@\nprepayid=%@\nnoncestr=%@\ntimestamp=%"
+                              @"ld\npackage=%@\nsign=%@",
+                              [config objectForKey:@"appid"], req.partnerId, req.prepayId,
+                              req.nonceStr, (long)req.timeStamp, req.package, req.sign];
+      
       callback(@[ configInfo ]);
     } else {
       callback(@[ @{ @"errorInfo" : @"retcode.intvalue不为0" } ]);
@@ -174,12 +174,11 @@ RCT_EXPORT_METHOD(pay
 RCT_EXPORT_METHOD(authorize
                   : (NSDictionary *)config
                   : (RCTResponseSenderBlock)callback) {
-
+  
   authCallback = callback;
-
+  
   authStateString = [[NSUUID UUID] UUIDString];
-  NSLog(@"%@", authStateString);
-
+  
   SendAuthReq *req = [[SendAuthReq alloc] init];
   req.scope = @"snsapi_userinfo";
   req.state = authStateString;
@@ -200,31 +199,47 @@ typedef void (^completionBlock)(NSError *error, UIImage *image);
 - (void)getImgaeWithUrl:(NSString *)url
      andCompletionBlock:(completionBlock)completionBlock {
   if (url.length && _bridge.imageLoader) {
-  NSURLRequest *request =
-      [NSURLRequest requestWithURL:[NSURL URLWithString:url]];
-  [_bridge.imageLoader
-      loadImageWithURLRequest:request
-                         size:CGSizeMake(100, 100)
-                        scale:1.0
-                      clipped:NO
-                   resizeMode:RCTResizeModeStretch
-                progressBlock:nil
-              completionBlock:^(NSError *error, UIImage *image) {
-                completionBlock(error, image);
-              }];
+    NSURLRequest *request =
+    [NSURLRequest requestWithURL:[NSURL URLWithString:url]];
+    [_bridge.imageLoader
+     loadImageWithURLRequest:request
+     size:CGSizeMake(100, 100)
+     scale:1.0
+     clipped:NO
+     resizeMode:RCTResizeModeStretch
+     progressBlock:nil
+     completionBlock:^(NSError *error, UIImage *image) {
+       completionBlock(error, image);
+     }];
   }
 }
 
 - (int)judgeSceneTypeWithConfig:(NSDictionary *)config {
-
+  
   NSString *sceneName = [config objectForKey:@"scene"];
-
+  
   if ([sceneName isEqualToString:@"timeline"]) {
     return 1;
   } else if ([sceneName isEqualToString:@"favorite"]) {
     return 2;
   } else
     return 0;
+}
+
+-(NSString *)getErrorInfoMessageWithErrcode: (int)errCode {
+  NSString *errorInfo;
+  if (errCode == WXErrCodeCommon) {
+    errorInfo = @"WXErrCodeCommon";
+  } else if (errCode == WXErrCodeUserCancel) {
+    errorInfo = @"user cancel";
+  } else if (errCode == WXErrCodeSentFail) {
+    errorInfo = @"send Fail";
+  } else if (errCode == WXErrCodeAuthDeny) {
+    errorInfo = @"auth deny";
+  } else if (errCode == WXErrCodeUnsupport) {
+    errorInfo = @"wx unsupport";
+  }
+  return errorInfo;
 }
 
 #pragma mark - delegate
@@ -234,107 +249,55 @@ typedef void (^completionBlock)(NSError *error, UIImage *image);
 }
 
 - (void)onResp:(BaseResp *)resp {
-
+  
   NSLog(@"onResp...cls= %@", [resp class]);
-
-  if ([resp isKindOfClass:[SendAuthResp class]]) {
-    SendAuthResp *authResp = (SendAuthResp *)resp;
-    NSString *code = authResp.code;
-    NSString *country = authResp.country;
-    NSString *lang = authResp.lang;
-    NSString *state = authResp.state;
-    NSString *errorInfo;
-    NSMutableDictionary *result =
-        [[NSMutableDictionary alloc] initWithCapacity:10];
-
-    if (resp.errCode == WXSuccess) {
+  
+  NSMutableDictionary *result =
+  [[NSMutableDictionary alloc] initWithCapacity:10];
+  
+  NSString *errCode = [NSString stringWithFormat:@"%d", resp.errCode];
+  NSString *errorInfo;
+  [result setValue:resp.errStr forKey:@"errStr"];
+  [result setValue:[NSString stringWithFormat:@"%d", resp.type] forKey:@"type"];
+  errorInfo = [self getErrorInfoMessageWithErrcode:errCode];
+  if (errCode == WXSuccess) {
+    [result setValue:[NSNumber numberWithBool:YES] forKey:@"success"];
+    if ([resp isKindOfClass:[SendAuthResp class]]) {
+      SendAuthResp *authResp = (SendAuthResp *)resp;
+      NSString *code = authResp.code;
+      NSString *country = authResp.country;
+      NSString *lang = authResp.lang;
+      NSString *state = authResp.state;
       if (authStateString != nil && [authStateString isEqualToString:state]) {
-        if (code) {
-          [result setObject:code forKey:@"code"];
-        }
-        if (country) {
-          [result setObject:country forKey:@"country"];
-        }
-        if (lang) {
-          [result setObject:lang forKey:@"lang"];
-        }
+        [result setValue:code forKey:@"code"];
+        [result setValue:country forKey:@"country"];
+        [result setValue:lang forKey:@"lang"];
       } else {
         errorInfo = @"state doesn't match";
-        [result setObject:[NSNull null] forKey:@"success"];
+        [result setValue:[NSNull null] forKey:@"success"];
       }
-    } else {
-      if (resp.errCode == WXErrCodeCommon) {
-        errorInfo = @"WXErrCodeCommon";
-      } else if (resp.errCode == WXErrCodeUserCancel) {
-        errorInfo = @"user cancel";
-      } else if (resp.errCode == WXErrCodeSentFail) {
-        errorInfo = @"send Fail";
-      } else if (resp.errCode == WXErrCodeAuthDeny) {
-        errorInfo = @"auth deny";
-      } else if (resp.errCode == WXErrCodeUnsupport) {
-        errorInfo = @"wx unsupport";
-      }
+      [result setValue:errorInfo forKey:@"error"];
+      authCallback(@[ result ]);
+      authCallback = nil;
+      authStateString = nil;
+    } else if ([resp isKindOfClass:[SendMessageToWXResp class]]) {
+      SendMessageToWXResp *messageResp = (SendMessageToWXResp *)resp;
+      NSString *lang = messageResp.lang;
+      NSString *country = messageResp.country;
+      [result setValue:lang forKey:@"lang"];
+      [result setValue:country forKey:@"country"];
+      [result setValue:errorInfo forKey:@"error"];
+      shareCallback(@[ result ]);
+      shareCallback = nil;
+    } else if ([resp isKindOfClass:[PayResp class]]) {
+      PayResp *payResp = (PayResp *)resp;
+      NSString *returnKey = payResp.returnKey;
+      [result setValue:returnKey forKey:@"returnKey"];
+      [result setValue:errorInfo forKey:@"error"];
+      
+      payCallback(@[ result ]);
+      payCallback = nil;
     }
-
-    if (errorInfo && errorInfo.length > 0) {
-      [result setObject:errorInfo forKey:@"error"];
-    }
-    authCallback(@[ result ]);
-    authCallback = nil;
-    authStateString = nil;
-
-  } else if ([resp isKindOfClass:[SendMessageToWXResp class]]) {
-    SendMessageToWXResp *messageResp = (SendMessageToWXResp *)resp;
-    NSString *errCode = [NSString stringWithFormat:@"%d", messageResp.errCode];
-    NSString *errStr = messageResp.errStr;
-    NSString *type = [NSString stringWithFormat:@"%d", messageResp.type];
-    NSString *lang = messageResp.lang;
-    NSString *country = messageResp.country;
-
-    NSMutableDictionary *results =
-        [[NSMutableDictionary alloc] initWithCapacity:5];
-    if (errCode) {
-      [results setObject:errCode forKey:@"errCode"];
-    }
-    if (errStr) {
-      [results setObject:errStr forKey:@"errStr"];
-    }
-    if (type) {
-      [results setObject:type forKey:@"type"];
-    }
-    if (lang) {
-      [results setObject:lang forKey:@"lang"];
-    }
-    if (country) {
-      [results setObject:country forKey:@"country"];
-    }
-
-    shareCallback(@[ results ]);
-    shareCallback = nil;
-  } else if ([resp isKindOfClass:[PayResp class]]) {
-    PayResp *payResp = (PayResp *)resp;
-
-    NSString *errCode = [NSString stringWithFormat:@"%d", payResp.errCode];
-    NSString *errStr = payResp.errStr;
-    NSString *type = [NSString stringWithFormat:@"%d", payResp.type];
-    NSString *returnKey = payResp.returnKey;
-
-    NSMutableDictionary *results =
-        [[NSMutableDictionary alloc] initWithCapacity:5];
-    if (errCode) {
-      [results setObject:errCode forKey:@"errCode"];
-    }
-    if (errStr) {
-      [results setObject:errStr forKey:@"errStr"];
-    }
-    if (type) {
-      [results setObject:type forKey:@"type"];
-    }
-    if (returnKey) {
-      [results setObject:returnKey forKey:@"returnKey"];
-    }
-
-    payResultCallback(@[ results ]);
   }
 }
 

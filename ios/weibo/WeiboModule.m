@@ -1,168 +1,176 @@
+#define kDefaultScope  @""
+#define kDefaultRedirectUrl @"https://api.weibo.com/oauth2/default.html"
+
+#import "RCTImageLoader.h"
 #import "WeiboModule.h"
 
 static RCTResponseSenderBlock authCallback;
 static RCTResponseSenderBlock shareCallback;
+
 @implementation WeiboModule
+
+@synthesize bridge = _bridge;
 
 RCT_EXPORT_MODULE(Weibo);
 //注册
-RCT_EXPORT_METHOD(registerApp : (NSDictionary *)config : (RCTResponseSenderBlock)callback) {
+RCT_EXPORT_METHOD(registerApp : (NSString *)appKey : (RCTResponseSenderBlock)callback) {
   NSLog(@"%@", @"注册微博");
-  NSString *appKey = [config objectForKey:@"appKey"];
-  [WeiboSDK registerApp:appKey];
-}
-//判断微博客户端是否安装
-RCT_EXPORT_METHOD(isWeiboAppInstalled : (RCTResponseSenderBlock)callback) {
-  NSString *result = [NSString stringWithFormat:@"%d", [WeiboSDK isWeiboAppInstalled]];
-
-  callback(@[result]);
-}
-//判断微博是否支持分享
-RCT_EXPORT_METHOD(isCanShareInWeiboAPP : (RCTResponseSenderBlock)callback) {
-  NSString *result = [NSString stringWithFormat:@"%d", [WeiboSDK isCanShareInWeiboAPP]];
-
-  callback(@[result]);
-}
-//判断是否支持SSO授权
-RCT_EXPORT_METHOD(isCanSSOInWeiboApp : (RCTResponseSenderBlock)callback) {
-  NSString *result = [NSString stringWithFormat:@"%d", [WeiboSDK isCanSSOInWeiboApp]];
-
+  BOOL appRegistered = NO;
+  NSMutableDictionary *result = [NSMutableDictionary dictionaryWithCapacity:3];
+  if (appKey !=nil && appKey.length > 0) {
+    appRegistered = [WeiboSDK registerApp:appKey];
+    [result setObject:[NSNumber numberWithBool:appRegistered] forKey:@"appRegistered"];
+    [result setObject:[NSNumber numberWithBool:[WeiboSDK isWeiboAppInstalled]] forKey:@"weiboAppInstalled"];
+    [result setObject:[NSNumber numberWithBool:[WeiboSDK isCanShareInWeiboAPP]] forKey:@"weiboAppCanShare"];
+    [result setObject:[NSNumber numberWithBool:[WeiboSDK isCanSSOInWeiboApp]] forKey:@"weiboAppCanSSO"];
+  }
   callback(@[result]);
 }
 //打开微博
 RCT_EXPORT_METHOD(openWeiboApp : (RCTResponseSenderBlock)callback) {
   NSString *result = [NSString stringWithFormat:@"%d", [WeiboSDK openWeiboApp]];
-
   callback(@[result]);
 }
-//获取微博的App安装Url
-RCT_EXPORT_METHOD(getWeiboAppInstallUrl : (RCTResponseSenderBlock)callback) {
-  NSString *result = [WeiboSDK getWeiboAppInstallUrl];
-
-  callback(@[result]);
-}
-//获取微博SDK版本号
-RCT_EXPORT_METHOD(getSDKVersion : (RCTResponseSenderBlock)callback) {
-  NSString *result = [WeiboSDK getSDKVersion];
-
-  callback(@[result]);
-}
-
 //授权
 RCT_EXPORT_METHOD(authorize : (NSDictionary *)config : (RCTResponseSenderBlock)callback) {
   NSLog(@"authorize...");
-
+  
   [WeiboSDK enableDebugMode:YES];
-
+  
   authCallback = callback;
   WBAuthorizeRequest *request = [WBAuthorizeRequest request];
-  request.redirectURI = [config objectForKey:@"redirectUrl"];
-  request.scope = [config objectForKey:@"scope"];
+  NSString *scope  = kDefaultScope;
+  if ([config objectForKey:@"scope"]) {
+    scope = [config objectForKey:@"scope"];
+  }
+  NSString *redirectURI = kDefaultRedirectUrl;
+  if ([config objectForKey:@"redirectUrl"]) {
+    redirectURI = [config objectForKey:@"redirectUrl"];
+  }
+  request.redirectURI = redirectURI;
+  request.scope = scope;
   [WeiboSDK sendRequest:request];
 }
-//视频链接+文字
-RCT_EXPORT_METHOD(sendVideo : (NSDictionary *)config : (RCTResponseSenderBlock)callback) {
+
+RCT_EXPORT_METHOD(share: (NSDictionary *)config : (RCTResponseSenderBlock)callback) {
+  NSLog(@"%s",__FUNCTION__);
   shareCallback = callback;
-
-  WBMessageObject *message = [self getMessageWithConfig:config];
-
-  WBVideoObject *videoObject = [WBVideoObject object];
-
-  videoObject.objectID = [config objectForKey:@"objectID"];
-  videoObject.title = [config objectForKey:@"title"];
-  videoObject.description = [config objectForKey:@"description"];
-  videoObject.thumbnailData = [NSData dataWithContentsOfFile:[config objectForKey:@"thumbnail"]];
-
-  videoObject.videoUrl = [config objectForKey:@"videoUrl"];
-  videoObject.videoStreamUrl = [config objectForKey:@"videoStreamUrl"];
-  videoObject.videoLowBandUrl = [config objectForKey:@"videoLowBandUrl"];
-  videoObject.videoLowBandStreamUrl = [config objectForKey:@"videoLowBandStreamUrl"];
-
-  message.mediaObject = videoObject;
-
-  [self sendRequestWithMessage:message config:config];
-}
-//音乐链接+文字
-RCT_EXPORT_METHOD(sendMusic : (NSDictionary *)config : (RCTResponseSenderBlock)callback) {
-
-  shareCallback = callback;
-
-
-
-  WBMessageObject *message = [self getMessageWithConfig:config];
-
-  WBMusicObject *musicObject = [WBMusicObject object];
-
-  musicObject.objectID = [config objectForKey:@"objectID"];
-  musicObject.title = [config objectForKey:@"title"];
-  musicObject.description = [config objectForKey:@"description"];
-  musicObject.thumbnailData = [NSData dataWithContentsOfFile:[config objectForKey:@"thumbnail"]];
-
-  musicObject.musicUrl = [config objectForKey:@"musicUrl"];
-  musicObject.musicLowBandUrl = [config objectForKey:@"musicLowBandUrl"];
-  musicObject.musicStreamUrl = [config objectForKey:@"musicStreamUrl"];
-  musicObject.musicLowBandStreamUrl = [config objectForKey:@"musicLowBandStreamUrl"];
-
-  message.mediaObject = musicObject;
-
-  [self sendRequestWithMessage:message config:config];
-}
-//网页链接+文字
-RCT_EXPORT_METHOD(sendWebPage : (NSDictionary *)config : (RCTResponseSenderBlock)callback) {
-
-  shareCallback = callback;
-
-  WBMessageObject *message = [self getMessageWithConfig:config];
-
-  WBWebpageObject *webObject = [WBWebpageObject object];
-  webObject.objectID = [config objectForKey:@"objectID"];
-  webObject.title = [config objectForKey:@"title"];
-  webObject.description = [config objectForKey:@"description"];
-  webObject.thumbnailData = [NSData dataWithContentsOfFile:[config objectForKey:@"thumbnail"]];
-  webObject.webpageUrl = [config objectForKey:@"webpageUrl"];
-
-  message.mediaObject = webObject;
-
-  [self sendRequestWithMessage:message config:config];
-}
-//图文
-RCT_EXPORT_METHOD(sendImage : (NSDictionary *)config : (RCTResponseSenderBlock)callback) {
-  shareCallback = callback;
-
-  WBMessageObject *message = [self getMessageWithConfig:config];
-
-  WBImageObject *imageObject = [WBImageObject object];
-  imageObject.imageData = [NSData dataWithContentsOfFile:[config objectForKey:@"imagePath"]];
-  message.imageObject = imageObject;
-
-  [self sendRequestWithMessage:message config:config];
-}
-
-// 1纯文本
-RCT_EXPORT_METHOD(sendText : (NSDictionary *)config : (RCTResponseSenderBlock)callback) {
-  shareCallback = callback;
-
-  WBMessageObject *message = [self getMessageWithConfig:config];
-
-  [self sendRequestWithMessage:message config:config];
-}
-
-- (WBMessageObject *)getMessageWithConfig:(NSDictionary *)config {
-
   WBMessageObject *message = [WBMessageObject message];
-  message.text = [config objectForKey:@"text"];
-  return message;
-}
-
-- (void)sendRequestWithMessage:(WBMessageObject *)message config:(NSDictionary *)config {
-
+  
+  NSString *scope  = kDefaultScope;
+  if ([config objectForKey:@"scope"]) {
+    scope = [config objectForKey:@"scope"];
+  }
+  NSString *redirectURI = kDefaultRedirectUrl;
+  if ([config objectForKey:@"redirectUrl"]) {
+    redirectURI = [config objectForKey:@"redirectUrl"];
+  }
+  
   WBAuthorizeRequest *shareRequest = [WBAuthorizeRequest request];
-  shareRequest.redirectURI = [config objectForKey:@"redirectURI"];
-  shareRequest.scope = [config objectForKey:@"scope"];
-
+  shareRequest.scope = scope;
+  shareRequest.redirectURI = redirectURI;
+  
+  NSString *title = [config objectForKey:@"title"];
+  NSString *description = [config objectForKey:@"description"];
+  NSString *objectID = [[NSUUID UUID] UUIDString];
+  if ([config objectForKey:@"objectID"]) {
+    objectID = [config objectForKey:@"objectID"];
+  }
+  NSString *thumb = [config objectForKey:@"thumb"];
+  NSData *thumbData;
+  if (thumb && thumb.length > 0) {
+    if ([[thumb substringToIndex:1] isEqualToString:@"/"]) {
+      thumbData = [NSData dataWithContentsOfFile:thumb];
+    } else {
+      thumbData = [NSData dataWithContentsOfURL:[NSURL URLWithString:thumb]];
+      UIImage *resultImage = [UIImage imageWithData:thumbData];
+      while (thumbData.length > 32000) {
+        NSLog(@"图片大小为%f", thumbData.length);
+        thumbData = UIImageJPEGRepresentation(resultImage, 0.9);
+      }
+    }
+  }
+  if ([config objectForKey:@"text"]) {
+    message.text = [config objectForKey:@"text"];
+  }
+  if ([config objectForKey:@"image"]) {
+    WBImageObject *imageObject = [WBImageObject object];
+    NSString *imageUrl = [config objectForKey:@"image"];
+    if ([[imageUrl substringToIndex:1] isEqualToString:@"/"] ) {
+      imageObject.imageData = [NSData dataWithContentsOfFile:imageUrl];
+      message.imageObject = imageObject;
+    } else {
+      NSData *imageData = [NSData dataWithContentsOfURL:[NSURL URLWithString:imageUrl]];
+      imageObject.imageData = imageData;
+      message.imageObject = imageObject;
+    }
+  } else if ([config objectForKey:@"webpage"]) {
+    WBWebpageObject *webObject = [WBWebpageObject object];
+    webObject.objectID = objectID;
+    webObject.title = title;
+    webObject.description = description;
+    webObject.thumbnailData = thumbData;
+    webObject.webpageUrl = [config objectForKey:@"webpage"];
+    message.mediaObject = webObject;
+  } else if ([config objectForKey:@"music"]) {
+    WBMusicObject *musicObject = [WBMusicObject object];
+    
+    musicObject.objectID = objectID;
+    musicObject.title = title;
+    musicObject.description = description;
+    musicObject.thumbnailData = thumbData;
+    
+    musicObject.musicUrl = [config objectForKey:@"music"];
+    musicObject.musicStreamUrl = [config objectForKey:@"data"];
+    
+    message.mediaObject = musicObject;
+    
+  } else if([config objectForKey:@"video"]) {
+    WBVideoObject *videoObject = [WBVideoObject object];
+    videoObject.objectID = objectID;
+    videoObject.title = title;
+    videoObject.description = description;
+    videoObject.thumbnailData = thumbData;
+    
+    videoObject.videoUrl = [config objectForKey:@"video"];
+    videoObject.videoStreamUrl = [config objectForKey:@"data"];
+    message.mediaObject = videoObject;
+  }
+  
   WBSendMessageToWeiboRequest *request =
   [WBSendMessageToWeiboRequest requestWithMessage:message authInfo:shareRequest access_token:nil];
   [WeiboSDK sendRequest:request];
+  
+}
+
+-(NSString *)getErrorInfoMessageWithStatusCode:(WeiboSDKResponseStatusCode)statusCode {
+  NSString *errorInfo;
+  switch (statusCode) {
+    case -1:
+      errorInfo = @"UserCancel";
+      break;
+    case -2:
+      errorInfo = @"SentFail";
+      break;
+    case -3:
+      errorInfo = @"AuthDeny";
+      break;
+    case -4:
+      errorInfo = @"UserCancelInstall";
+      break;
+    case -8:
+      errorInfo = @"ShareInSDKFailed";
+      break;
+    case -99:
+      errorInfo = @"Unsupport";
+      break;
+    case -100:
+      errorInfo = @"Unknown";
+      break;
+    default:
+      break;
+  }
+  return errorInfo;
 }
 
 - (void)didReceiveWeiboRequest:(WBBaseRequest *)request {
@@ -171,6 +179,11 @@ RCT_EXPORT_METHOD(sendText : (NSDictionary *)config : (RCTResponseSenderBlock)ca
 
 - (void)didReceiveWeiboResponse:(WBBaseResponse *)response {
   NSLog(@"didReceiveWeiboResponse...");
+  
+  NSMutableDictionary *result = [NSMutableDictionary dictionaryWithCapacity:10];
+  NSDictionary *requestUserInfo = response.requestUserInfo;
+  [result setValue:requestUserInfo forKey:@"requestUserInfo"];
+  NSString *errorInfo =  [self getErrorInfoMessageWithStatusCode:response.statusCode];
   if ([response isKindOfClass:WBAuthorizeResponse.class]) {
     WBAuthorizeResponse *authorizeResponse = (WBAuthorizeResponse *)response;
     NSString *uid = authorizeResponse.userID;
@@ -179,49 +192,32 @@ RCT_EXPORT_METHOD(sendText : (NSDictionary *)config : (RCTResponseSenderBlock)ca
     NSInteger expiresInSeconds = [authorizeResponse.expirationDate timeIntervalSinceNow];
     NSLog(@"didReceiveWeiboResponse...uid=%@, accessToken=%@, refreshToken=%@, expiresInSeconds=%zd", uid, accessToken,
           refreshToken, expiresInSeconds);
-
-    NSMutableDictionary *results = [NSMutableDictionary dictionaryWithCapacity:4];
-    if (uid) {
-      [results setValue:uid forKey:@"uid"];
-    }
-    if (accessToken) {
-      [results setValue:accessToken forKey:@"accessToken"];
-    }
-    if (refreshToken) {
-      [results setValue:refreshToken forKey:@"refreshToken"];
-    }
-    if (expiresInSeconds > 0) {
-      [results setValue:[NSNumber numberWithInteger:expiresInSeconds] forKey:@"expiresInSeconds"];
-    }
-
-    authCallback(@[results]);
+    [result setValue:uid forKey:@"uid"];
+    [result setValue:accessToken forKey:@"accessToken"];
+    [result setValue:refreshToken forKey:@"refreshToken"];
+    [result setValue:[NSNumber numberWithInteger:expiresInSeconds] forKey:@"expiresInSeconds"];
+    [result setValue:errorInfo forKey:@"errorInfo"];
+    
+    authCallback(@[result]);
     authCallback = nil;
   } else if ([response isKindOfClass:WBSendMessageToWeiboResponse.class]) {
-
     WBSendMessageToWeiboResponse *shareResponse = (WBSendMessageToWeiboResponse *)response;
     NSDictionary *userInfo = shareResponse.userInfo;
     NSDictionary *requestUserInfo = shareResponse.requestUserInfo;
     NSString *statusCode = [NSString stringWithFormat:@"%d", (int)response.statusCode];
-
-    NSMutableDictionary *results = [[NSMutableDictionary alloc] initWithCapacity:3];
-
-    if (userInfo) {
-      [results setObject:userInfo forKey:@"userInfo"];
-    }
-    if (requestUserInfo) {
-      [results setObject:requestUserInfo forKey:@"requestUserInfo"];
-    }
-    if (statusCode) {
-      [results setObject:statusCode forKey:@"statusCode"];
-    }
-
-    shareCallback(@[results]);
+    
+    [result setValue:userInfo forKey:@"userInfo"];
+    [result setValue:statusCode forKey:@"statusCode"];
+    [result setValue:errorInfo forKey:@"errorInfo"];
+    
+    shareCallback(@[result]);
+    shareCallback = nil;
   }
 }
 
 + (BOOL)handleOpenURL:(NSURL *)url {
   NSLog(@"URL :%@ ", url);
-
+  
   WeiboModule *weiboModule = [[WeiboModule alloc] init];
   return [WeiboSDK handleOpenURL:url delegate:weiboModule];
 }
