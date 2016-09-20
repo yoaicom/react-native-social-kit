@@ -78,7 +78,8 @@ export default class Demo extends Component {
 
   shareImage() {
     Weixin.share({
-      image: "file://" +resolveAssetSource(require('./image/femme.jpg')).uri,
+      image: resolveAssetSource(require('./image/femme.jpg')).uri,
+      // image:'http://static.yoaicdn.com/shoppc/images/cover_img_e1e9e6b.jpg',
       scene: 'session'
     }, this.callback);
   }

@@ -14,7 +14,7 @@ export default class Demo extends Component {
 
 
   componentDidMount() {
-    Weibo.registerApp('3928876547', this.callback);
+    Weibo.registerApp('2641053562', this.callback);
   }
 
   render() {
@@ -51,14 +51,17 @@ export default class Demo extends Component {
   share() {
     Weibo.share({
       text: 'Hello World, 你好!',
-      //image: 'http://static.yoaicdn.com/shoppc/images/cover_img_e1e9e6b.jpg@!yoai_img_middle',
-      video: 'http://www.yoai.com/know_tampons.html',
-      title: '这是一个标题',
+      image: 'http://static.yoaicdn.com/shoppc/images/cover_img_e1e9e6b.jpg',
+      // video: 'http://www.yoai.com/know_tampons.html',
+      title: '这是一个音乐标题',
       description: '这是一个描述',
       thumb: 'http://tva4.sinaimg.cn/crop.0.0.180.180.50/6306d074jw1e8qgp5bmzyj2050050aa8.jpg',
+      // thumb: thumbnail,
+      // webpage: 'http://www.baidu.com',
+      // music: 'http://www.baidu.com',
       //data: 'http://so1.111ttt.com:8282/2016/1/09/12/202121628190.mp3',
       data: 'http://v.yoai.com/femme_tampon_tutorial.mp4',
-      duration: 100
+      // duration: 100
     }, this.callback);
   }
 
