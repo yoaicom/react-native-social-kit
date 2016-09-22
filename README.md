@@ -6,7 +6,7 @@
 **项目仍在开发中，功能不稳定，请耐心等待。**
 
 # Demo
-![Demo](./gif/Demo.gif)
+![Demo](./gif/Demo.gi)
 
 
 # 安装
@@ -250,21 +250,21 @@ public class MainActivity extends ReactActivity {
 
 In your JavaScript code:
 
-```javascript
+```
 import SocialKit from 'react-native-social-kit';
 const {Weibo, Weixin, QQ, Ali} = SocialKit;
 ```
 
 or simply
 
-```javascript
+```
 import {Weibo, Weixin, QQ, Ali} from 'react-native-social-kit';
 ```
 Then, use it like:
 
-```javascript
+```
 Weibo.authorize({
-  appId: '3928876547',
+  scope: "all",
   redirectUrl: 'https://api.weibo.com/oauth2/default.html'
 }, (data) => {
   if (data.error) {
@@ -280,7 +280,7 @@ Weibo.authorize({
 
 # 注册App
 
-##### SDKNAME.authorize(config, (data) => {
+##### SDKNAME.registerApp(config, (data) => {
 
 ##### })
 
@@ -312,11 +312,10 @@ SDKNAME表示Weixin、Weibo、QQ ,Ali 下同
 
 # 授权登陆API
 
-##### SDKNAME.registerApp(config, (data) => {
+##### SDKNAME.authorize(config, (data) => {
 
 ##### })
 
-​	
 
 ###### config
 
@@ -324,10 +323,8 @@ SDKNAME表示Weixin、Weibo、QQ ,Ali 下同
 
 | key         | value                                    | Weixin |  Weibo  |   QQ    |
 | ----------- | ---------------------------------------- | ------ | :-----: | :-----: |
-| appId       | 第三方账号的App Key或App ID，必填                  | OK     |   OK    |   OK    |
-| redirectUrl | 微博授权回调页，一般为"https://api.weibo.com/oauth2/default.html"，必填 | NA     |   OK    |   NA    |
+| redirectUrl | 微博授权回调页，可不填，默认为"https://api.weibo.com/oauth2/default.html"， | NA     |   OK    |   NA    |
 | scope       | 授权的权限范围，可不填，默认最低权限                       | NA     | Not Yet | Not Yet |
-| state       | 用于保持请求和回调的状态，授权请求后原样带回给第三方。该参数可用于防止csrf攻击（跨站请求伪造攻击）       | OK     | NA | NA |
 | permissions | 发送授权范围请求       | NA     | NA | OK |
 
 ###### data
@@ -350,7 +347,8 @@ SDKNAME表示Weixin、Weibo、QQ ,Ali 下同
 微博授权结果
 
 | key              | value |
-| ---------------- | :---- |
+| ---------------- | ----- |
+|requestUserInfo   |       |
 | uid              |       |
 | accessToken      |       |
 | refreshToken     |       |
@@ -364,8 +362,13 @@ QQ授权结果
 | accessToken      |       |
 | expiresInSeconds |       |
 
+以微信为例,授权代码如下
 
-
+```
+ auth() {
+    Weixin.authorize(null, this.apiCallback.bind(this));
+  }
+```
 # 分享API 
 
 ##### SDKNAME.share'MessageType'(config, (data) => {
@@ -374,22 +377,30 @@ QQ授权结果
 
 MessageType 不同模块能分享的内容不同 见下表:
 
-| SDKNAME              | Text |Image |ImageArray |WebPage |Music |Video |App | NonGif|Gif | File| 
-| ---------------------| ---- |------|-----------|--------|------|------|----|-------|----|-----| 
-| Weixin               |   √  |   √  |     x     |    √   |  √   |   √  |  √ |    √  |  √ |   √ | 
-| Weibo                |   √  |   √  |     x     |    √   |  √   |   √  |  x |    x  |  x |   x | 
-| QQ                   |   √  |   √  |     √     |    √   |  √   |   √  |  x |    x  |  x |   x | 
+| SDKNAME              | Text |Image |WebPage |Music |Video |
+| ---------------------| ---- |------|--------|------|------|
+| Weixin               |   √  |   √  |    √   |  √   |   √  |
+| Weibo                |   √  |   √  |    √   |  √   |   √  |
+| QQ                   |   √  |   √  |    √   |  √   |   √  |
 
 
-具体参数配置见[Demo](./Demo)
+以微信图片分享为例,代码如下
+
+```
+shareImage(scene) {
+    Weixin.share({
+      image:'http://static.yoaicdn.com/shoppc/images/cover_img_e1e9e6b.jpg',
+      scene: scene,
+    }, this.shareCallback.bind(this));
+  }
+```
+
+具体参数配置见[Demo](./ShareSDKDemo)
 
 # 支付API 
 
 ##### SDKNAME.pay(
 ##### config, 
-##### (data) => {
-
-#####  },
 ##### (data) => {
 
 #####  }
