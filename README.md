@@ -410,7 +410,7 @@ shareImage(scene) {
 
 | SDKNAME         | config                | 
 | ----------------| --------------------- |
-| Weixin          | {retcode:'',timestamp:'',partnerid:'',prepayid:'',noncestr:'',package:'',sign:''}           | 
+| Weixin          | {timestamp:'',partnerid:'',prepayid:'',noncestr:'',timeStamp:'',package:'',sign:''} android需要添加appId         | 
 | Ali             | {orderString: '',appScheme:''}          |
 
 

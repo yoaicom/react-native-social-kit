@@ -1,11 +1,3 @@
-//
-//  AliMudule.m
-//  Demo
-//
-//  Created by 张天 on 16/8/16.
-//  Copyright © 2016年 Facebook. All rights reserved.
-//
-
 #import "AliModule.h"
 
 static RCTResponseSenderBlock payCallback;

@@ -139,35 +139,16 @@ RCT_EXPORT_METHOD(pay
   payCallback = callback;
   
   if (config != nil) {
-    NSMutableString *retcode = [config objectForKey:@"retcode"];
-    if (retcode.intValue == 0) {
-      NSMutableString *stamp = [config objectForKey:@"timestamp"];
-      
       //调起微信支付
       PayReq *req = [[PayReq alloc] init];
       req.partnerId = [config objectForKey:@"partnerid"];
       req.prepayId = [config objectForKey:@"prepayid"];
       req.nonceStr = [config objectForKey:@"noncestr"];
-      req.timeStamp = stamp.intValue;
+      req.timeStamp = [config objectForKey:@"timestamp"];
       req.package = [config objectForKey:@"package"];
       req.sign = [config objectForKey:@"sign"];
       [WXApi sendReq:req];
-      
-      //日志输出
-      NSString *configInfo = [NSString
-                              stringWithFormat:
-                              @"appid=%@\npartid=%@\nprepayid=%@\nnoncestr=%@\ntimestamp=%"
-                              @"ld\npackage=%@\nsign=%@",
-                              [config objectForKey:@"appid"], req.partnerId, req.prepayId,
-                              req.nonceStr, (long)req.timeStamp, req.package, req.sign];
-      
-      callback(@[ configInfo ]);
-    } else {
-      callback(@[ @{ @"errorInfo" : @"retcode.intvalue不为0" } ]);
     }
-  } else {
-    callback(@[ @{ @"errorInfo" : @"Config信息为空" } ]);
-  }
 }
 
 #pragma mark - 授权登陆
@@ -275,7 +256,6 @@ typedef void (^completionBlock)(NSError *error, UIImage *image);
       [result setValue:lang forKey:@"lang"];
     } else {
       errorInfo = @"state doesn't match";
-      
     }
     [result setValue:errorInfo forKey:@"error"];
     authCallback(@[ result ]);
