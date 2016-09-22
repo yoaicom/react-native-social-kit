@@ -13,7 +13,7 @@ import {
 
 import sdk from 'react-native-social-kit';
 
-import styles from './Style';
+import styles from './js/Style';
 let WINDOW_WIDTH = Dimensions.get('window').width;
 let WINDOW_HEIGHT = Dimensions.get('window').height;
 

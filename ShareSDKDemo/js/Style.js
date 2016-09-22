@@ -5,6 +5,7 @@ let WINDOW_HEIGHT = Dimensions.get('window').height;
 
 var styles = StyleSheet.create({
   container:{
+    width: WINDOW_WIDTH,
     backgroundColor: 'white',
     marginTop:20
   },
@@ -14,7 +15,7 @@ var styles = StyleSheet.create({
     alignItems:'center',
     height: 44,
     width: WINDOW_WIDTH,
-    backgroundColor: 'white'
+    backgroundColor: '#90C76D'
   },
   rowContent: {
     justifyContent: 'center',

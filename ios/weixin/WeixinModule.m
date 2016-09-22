@@ -171,6 +171,7 @@ RCT_EXPORT_METHOD(pay
 }
 
 #pragma mark - 授权登陆
+
 RCT_EXPORT_METHOD(authorize
                   : (NSDictionary *)config
                   : (RCTResponseSenderBlock)callback) {
@@ -228,7 +229,9 @@ typedef void (^completionBlock)(NSError *error, UIImage *image);
 
 -(NSString *)getErrorInfoMessageWithErrcode: (int)errCode {
   NSString *errorInfo;
-  if (errCode == WXErrCodeCommon) {
+  if( errCode == WXSuccess) {
+    errorInfo = @"WXSuccess";
+  } else if (errCode == WXErrCodeCommon) {
     errorInfo = @"WXErrCodeCommon";
   } else if (errCode == WXErrCodeUserCancel) {
     errorInfo = @"user cancel";
@@ -255,50 +258,48 @@ typedef void (^completionBlock)(NSError *error, UIImage *image);
   NSMutableDictionary *result =
   [[NSMutableDictionary alloc] initWithCapacity:10];
   
-  NSString *errCode = [NSString stringWithFormat:@"%d", resp.errCode];
+  int errCode = resp.errCode;
   NSString *errorInfo;
   [result setValue:resp.errStr forKey:@"errStr"];
   [result setValue:[NSString stringWithFormat:@"%d", resp.type] forKey:@"type"];
   errorInfo = [self getErrorInfoMessageWithErrcode:errCode];
-  if (errCode == WXSuccess) {
-    [result setValue:[NSNumber numberWithBool:YES] forKey:@"success"];
-    if ([resp isKindOfClass:[SendAuthResp class]]) {
-      SendAuthResp *authResp = (SendAuthResp *)resp;
-      NSString *code = authResp.code;
-      NSString *country = authResp.country;
-      NSString *lang = authResp.lang;
-      NSString *state = authResp.state;
-      if (authStateString != nil && [authStateString isEqualToString:state]) {
-        [result setValue:code forKey:@"code"];
-        [result setValue:country forKey:@"country"];
-        [result setValue:lang forKey:@"lang"];
-      } else {
-        errorInfo = @"state doesn't match";
-        [result setValue:[NSNull null] forKey:@"success"];
-      }
-      [result setValue:errorInfo forKey:@"error"];
-      authCallback(@[ result ]);
-      authCallback = nil;
-      authStateString = nil;
-    } else if ([resp isKindOfClass:[SendMessageToWXResp class]]) {
-      SendMessageToWXResp *messageResp = (SendMessageToWXResp *)resp;
-      NSString *lang = messageResp.lang;
-      NSString *country = messageResp.country;
-      [result setValue:lang forKey:@"lang"];
+  if ([resp isKindOfClass:[SendAuthResp class]]) {
+    SendAuthResp *authResp = (SendAuthResp *)resp;
+    NSString *code = authResp.code;
+    NSString *country = authResp.country;
+    NSString *lang = authResp.lang;
+    NSString *state = authResp.state;
+    if (authStateString != nil && [authStateString isEqualToString:state]) {
+      [result setValue:code forKey:@"code"];
       [result setValue:country forKey:@"country"];
-      [result setValue:errorInfo forKey:@"error"];
-      shareCallback(@[ result ]);
-      shareCallback = nil;
-    } else if ([resp isKindOfClass:[PayResp class]]) {
-      PayResp *payResp = (PayResp *)resp;
-      NSString *returnKey = payResp.returnKey;
-      [result setValue:returnKey forKey:@"returnKey"];
-      [result setValue:errorInfo forKey:@"error"];
+      [result setValue:lang forKey:@"lang"];
+    } else {
+      errorInfo = @"state doesn't match";
       
-      payCallback(@[ result ]);
-      payCallback = nil;
     }
+    [result setValue:errorInfo forKey:@"error"];
+    authCallback(@[ result ]);
+    authCallback = nil;
+    authStateString = nil;
+  } else if ([resp isKindOfClass:[SendMessageToWXResp class]]) {
+    SendMessageToWXResp *messageResp = (SendMessageToWXResp *)resp;
+    NSString *lang = messageResp.lang;
+    NSString *country = messageResp.country;
+    [result setValue:lang forKey:@"lang"];
+    [result setValue:country forKey:@"country"];
+    [result setValue:errorInfo forKey:@"error"];
+    shareCallback(@[ result ]);
+    shareCallback = nil;
+  } else if ([resp isKindOfClass:[PayResp class]]) {
+    PayResp *payResp = (PayResp *)resp;
+    NSString *returnKey = payResp.returnKey;
+    [result setValue:returnKey forKey:@"returnKey"];
+    [result setValue:errorInfo forKey:@"error"];
+    
+    payCallback(@[ result ]);
+    payCallback = nil;
   }
+  
 }
 
 - (void)dealloc {

@@ -98,13 +98,13 @@ RCT_EXPORT_METHOD(share: (NSDictionary *)config : (RCTResponseSenderBlock)callba
     NSString *imageUrl = [config objectForKey:@"image"];
     if ([[imageUrl substringToIndex:1] isEqualToString:@"/"] ) {
       imageObject.imageData = [NSData dataWithContentsOfFile:imageUrl];
-      message.imageObject = imageObject;
     } else {
       NSData *imageData = [NSData dataWithContentsOfURL:[NSURL URLWithString:imageUrl]];
       imageObject.imageData = imageData;
-      message.imageObject = imageObject;
     }
-  } else if ([config objectForKey:@"webpage"]) {
+    message.imageObject = imageObject;
+  }
+  if ([config objectForKey:@"webpage"]) {
     WBWebpageObject *webObject = [WBWebpageObject object];
     webObject.objectID = objectID;
     webObject.title = title;
@@ -207,7 +207,6 @@ RCT_EXPORT_METHOD(share: (NSDictionary *)config : (RCTResponseSenderBlock)callba
     NSString *statusCode = [NSString stringWithFormat:@"%d", (int)response.statusCode];
     
     [result setValue:userInfo forKey:@"userInfo"];
-    [result setValue:statusCode forKey:@"statusCode"];
     [result setValue:errorInfo forKey:@"errorInfo"];
     
     shareCallback(@[result]);
