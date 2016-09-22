@@ -3,7 +3,7 @@ let resolveAssetSource = require('resolveAssetSource');
 let path = require('./../jpg/thumbImage.jpg');
 let thumbImage = resolveAssetSource(path).uri;
 
-let webPageUrl = "https://mp.weixin.qq.com/s?__biz=MzI2ODA4ODcwMQ==&mid=500489922&idx=1&sn=6df2308492965731faa1f9e1efd4a409&scene=1&srcid=&key=305bc10ec50ec19b4cb833799b94c8ed06022b016acf704745a9a4549ec7b87a798efa86d710e6b8fcbe67d91be5a830&ascene=0&uin=MjQ3ODc4OTU2MQ%3D%3D&devicetype=iMac+MacBookPro12%2C1+OSX+OSX+10.11.5+build(15F34)&version=11020201&pass_ticket=YuSuaTyth73iIVCyAltJlqggSy0tUK4OaWZcQ%2BazSPMv0acKHj1dPi1%2BBHm2tAFe";
+let webPageUrl = "http://www.yoai.com/";
 
 let content = {
   text: {
