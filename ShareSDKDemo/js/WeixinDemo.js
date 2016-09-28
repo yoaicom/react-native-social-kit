@@ -265,7 +265,7 @@ export default class WeixinSDK extends Component {
   shareText(scene) {
     Weixin.share({
       text: content.text.text,
-      scene: scene
+      scene: scene,
       //scene: 'favorite'
       //scene: 'timeline'
     }, this.shareCallback.bind(this));

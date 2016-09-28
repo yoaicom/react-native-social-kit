@@ -1,9 +1,9 @@
 import React ,{Component} from 'react';
 import {ScrollView} from 'react-native';
 
-import WeixinSDK from './WeixinSDK';
-import WeiboSDK from './WeiboSDK';
-import QQSDK from './QQSDK';
+import WeixinSDK from './WeixinDemo';
+import WeiboSDK from './WeiboDemo';
+import QQSDK from './QQDemo';
 
 export default class Demo extends Component {
 
