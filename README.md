@@ -371,17 +371,24 @@ QQ授权结果
 ```
 # 分享API 
 
-##### SDKNAME.share'MessageType'(config, (data) => {
+##### SDKNAME.share(config, (data) => {
 
 ##### })
 
-MessageType 不同模块能分享的内容不同 见下表:
+config内配置内容参数见下表
 
-| SDKNAME              | Text |Image |WebPage |Music |Video |
-| ---------------------| ---- |------|--------|------|------|
-| Weixin               |   √  |   √  |    √   |  √   |   √  |
-| Weibo                |   √  |   √  |    √   |  √   |   √  |
-| QQ                   |   √  |   √  |    √   |  √   |   √  |
+| 分享内容              | scene①|title |description|thumb② |data③  |text④ |image④ |webpage|music|video |
+| ---------------------| ------|------|-----------|------|------|
+| text                 |   选填 |  -   |      -    | -    |   -  |必填|-|-|-|-|
+| image                |   选填 |   -  |    -   |  -   |   -  | -|必填|-|-|-| 
+| webpage              |   选填 |  选填 |    选填 |  选填 |  选填 |-|-|必填|-|-|
+| music                |   选填 |  选填 |    选填 |  选填 |  选填 |-|-|-|必填|-|
+| video                |   选填 |  选填 |    选填 |  选填 |  选填 |-|-|-|-|必填|
+
+①: 微信Scene默认为'session'(对话),可选'timeline'(朋友圈),'favorite'(收藏).微博没有scene参数,QQ此参数默认为'qq'(对话),可选'qzone'(QQ空间).
+②: thumb为缩略图链接地址,微信,微博对缩略图的大小限制在32k,如传入的图片大小超过32k,则会被压缩到32K以内.
+③: data参数表示实际数据链接,如分享music时data表示后缀为.mp3的url.
+④: 在微博中 text,image 于其他多媒体链接分别独立,可以同时分享(iOS端图片和多媒体暂时无法同时分享).
 
 
 以微信图片分享为例,代码如下
