@@ -139,16 +139,16 @@ RCT_EXPORT_METHOD(pay
   payCallback = callback;
   
   if (config != nil) {
-      //调起微信支付
-      PayReq *req = [[PayReq alloc] init];
-      req.partnerId = [config objectForKey:@"partnerid"];
-      req.prepayId = [config objectForKey:@"prepayid"];
-      req.nonceStr = [config objectForKey:@"noncestr"];
-      req.timeStamp = [config objectForKey:@"timestamp"];
-      req.package = [config objectForKey:@"package"];
-      req.sign = [config objectForKey:@"sign"];
-      [WXApi sendReq:req];
-    }
+    //调起微信支付
+    PayReq *req = [[PayReq alloc] init];
+    req.partnerId = [config objectForKey:@"partnerid"];
+    req.prepayId = [config objectForKey:@"prepayid"];
+    req.nonceStr = [config objectForKey:@"noncestr"];
+    req.timeStamp = [config objectForKey:@"timestamp"];
+    req.package = [config objectForKey:@"package"];
+    req.sign = [config objectForKey:@"sign"];
+    [WXApi sendReq:req];
+  }
 }
 
 #pragma mark - 授权登陆
@@ -210,12 +210,8 @@ typedef void (^completionBlock)(NSError *error, UIImage *image);
 
 -(NSString *)getErrorInfoMessageWithErrcode: (int)errCode {
   NSString *errorInfo;
-  if( errCode == WXSuccess) {
-    errorInfo = @"WXSuccess";
-  } else if (errCode == WXErrCodeCommon) {
+  if (errCode == WXErrCodeCommon) {
     errorInfo = @"WXErrCodeCommon";
-  } else if (errCode == WXErrCodeUserCancel) {
-    errorInfo = @"user cancel";
   } else if (errCode == WXErrCodeSentFail) {
     errorInfo = @"send Fail";
   } else if (errCode == WXErrCodeAuthDeny) {
@@ -244,41 +240,51 @@ typedef void (^completionBlock)(NSError *error, UIImage *image);
   [result setValue:resp.errStr forKey:@"errStr"];
   [result setValue:[NSString stringWithFormat:@"%d", resp.type] forKey:@"type"];
   errorInfo = [self getErrorInfoMessageWithErrcode:errCode];
-  if ([resp isKindOfClass:[SendAuthResp class]]) {
-    SendAuthResp *authResp = (SendAuthResp *)resp;
-    NSString *code = authResp.code;
-    NSString *country = authResp.country;
-    NSString *lang = authResp.lang;
-    NSString *state = authResp.state;
-    if (authStateString != nil && [authStateString isEqualToString:state]) {
-      [result setValue:code forKey:@"code"];
-      [result setValue:country forKey:@"country"];
-      [result setValue:lang forKey:@"lang"];
-    } else {
-      errorInfo = @"state doesn't match";
-    }
+  if (errCode == WXSuccess) {
+    [result setValue:[NSNumber numberWithBool:YES] forKey:@"success"];
+  } else if (errCode == WXErrCodeUserCancel) {
+    [result setValue:[NSNumber numberWithBool:YES] forKey:@"cancel"];
+  } else {
     [result setValue:errorInfo forKey:@"error"];
-    authCallback(@[ result ]);
-    authCallback = nil;
-    authStateString = nil;
-  } else if ([resp isKindOfClass:[SendMessageToWXResp class]]) {
-    SendMessageToWXResp *messageResp = (SendMessageToWXResp *)resp;
-    NSString *lang = messageResp.lang;
-    NSString *country = messageResp.country;
-    [result setValue:lang forKey:@"lang"];
-    [result setValue:country forKey:@"country"];
-    [result setValue:errorInfo forKey:@"error"];
-    shareCallback(@[ result ]);
-    shareCallback = nil;
-  } else if ([resp isKindOfClass:[PayResp class]]) {
-    PayResp *payResp = (PayResp *)resp;
-    NSString *returnKey = payResp.returnKey;
-    [result setValue:returnKey forKey:@"returnKey"];
-    [result setValue:errorInfo forKey:@"error"];
-    
-    payCallback(@[ result ]);
-    payCallback = nil;
   }
+    if ([resp isKindOfClass:[SendAuthResp class]]) {
+      if (errCode == WXSuccess) {
+        SendAuthResp *authResp = (SendAuthResp *)resp;
+        NSString *code = authResp.code;
+        NSString *country = authResp.country;
+        NSString *lang = authResp.lang;
+        NSString *state = authResp.state;
+        if (authStateString != nil && [authStateString isEqualToString:state]) {
+          [result setValue:code forKey:@"code"];
+          [result setValue:country forKey:@"country"];
+          [result setValue:lang forKey:@"lang"];
+        } else {
+          errorInfo = @"state doesn't match";
+        }
+      }
+      authCallback(@[ result ]);
+      authCallback = nil;
+      authStateString = nil;
+    } else if ([resp isKindOfClass:[SendMessageToWXResp class]]) {
+      if (errCode == WXSuccess) {
+        SendMessageToWXResp *messageResp = (SendMessageToWXResp *)resp;
+        NSString *lang = messageResp.lang;
+        NSString *country = messageResp.country;
+        [result setValue:lang forKey:@"lang"];
+        [result setValue:country forKey:@"country"];
+      }
+      shareCallback(@[ result ]);
+      shareCallback = nil;
+    } else if ([resp isKindOfClass:[PayResp class]]) {
+      if (errCode == WXSuccess) {
+        PayResp *payResp = (PayResp *)resp;
+        NSString *returnKey = payResp.returnKey;
+        [result setValue:returnKey forKey:@"returnKey"];
+      }
+      payCallback(@[ result ]);
+      payCallback = nil;
+    }
+  
   
 }
 

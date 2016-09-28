@@ -184,31 +184,35 @@ RCT_EXPORT_METHOD(share: (NSDictionary *)config : (RCTResponseSenderBlock)callba
   NSDictionary *requestUserInfo = response.requestUserInfo;
   [result setValue:requestUserInfo forKey:@"requestUserInfo"];
   NSString *errorInfo =  [self getErrorInfoMessageWithStatusCode:response.statusCode];
+  if (response.statusCode == WeiboSDKResponseStatusCodeSuccess) {
+    [result setValue:[NSNumber numberWithBool:YES] forKey:@"success"];
+  } else if (response.statusCode == WeiboSDKResponseStatusCodeUserCancel) {
+    [result setValue:[NSNumber numberWithBool:YES] forKey:@"cancel"];
+  } else {
+    [result setValue:errorInfo forKey:@"error"];
+  }
   if ([response isKindOfClass:WBAuthorizeResponse.class]) {
-    WBAuthorizeResponse *authorizeResponse = (WBAuthorizeResponse *)response;
-    NSString *uid = authorizeResponse.userID;
-    NSString *accessToken = authorizeResponse.accessToken;
-    NSString *refreshToken = authorizeResponse.refreshToken;
-    NSInteger expiresInSeconds = [authorizeResponse.expirationDate timeIntervalSinceNow];
-    NSLog(@"didReceiveWeiboResponse...uid=%@, accessToken=%@, refreshToken=%@, expiresInSeconds=%zd", uid, accessToken,
-          refreshToken, expiresInSeconds);
-    [result setValue:uid forKey:@"uid"];
-    [result setValue:accessToken forKey:@"accessToken"];
-    [result setValue:refreshToken forKey:@"refreshToken"];
-    [result setValue:[NSNumber numberWithInteger:expiresInSeconds] forKey:@"expiresInSeconds"];
-    [result setValue:errorInfo forKey:@"errorInfo"];
-    
+    if (response.statusCode == WeiboSDKResponseStatusCodeSuccess) {
+      WBAuthorizeResponse *authorizeResponse = (WBAuthorizeResponse *)response;
+      NSString *uid = authorizeResponse.userID;
+      NSString *accessToken = authorizeResponse.accessToken;
+      NSString *refreshToken = authorizeResponse.refreshToken;
+      NSInteger expiresInSeconds = [authorizeResponse.expirationDate timeIntervalSinceNow];
+      [result setValue:uid forKey:@"uid"];
+      [result setValue:accessToken forKey:@"accessToken"];
+      [result setValue:refreshToken forKey:@"refreshToken"];
+      [result setValue:[NSNumber numberWithInteger:expiresInSeconds] forKey:@"expiresInSeconds"];
+    }
     authCallback(@[result]);
     authCallback = nil;
   } else if ([response isKindOfClass:WBSendMessageToWeiboResponse.class]) {
-    WBSendMessageToWeiboResponse *shareResponse = (WBSendMessageToWeiboResponse *)response;
-    NSDictionary *userInfo = shareResponse.userInfo;
-    NSDictionary *requestUserInfo = shareResponse.requestUserInfo;
-    NSString *statusCode = [NSString stringWithFormat:@"%d", (int)response.statusCode];
-    
-    [result setValue:userInfo forKey:@"userInfo"];
-    [result setValue:errorInfo forKey:@"errorInfo"];
-    
+    if (response.statusCode == WeiboSDKResponseStatusCodeSuccess) {
+      WBSendMessageToWeiboResponse *shareResponse = (WBSendMessageToWeiboResponse *)response;
+      NSDictionary *userInfo = shareResponse.userInfo;
+      NSDictionary *requestUserInfo = shareResponse.requestUserInfo;
+      NSString *statusCode = [NSString stringWithFormat:@"%d", (int)response.statusCode];
+      [result setValue:userInfo forKey:@"userInfo"];
+    }
     shareCallback(@[result]);
     shareCallback = nil;
   }

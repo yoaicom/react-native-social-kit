@@ -205,7 +205,7 @@ RCT_EXPORT_METHOD(authorize : (NSDictionary *)config : (RCTResponseSenderBlock)c
   
   NSMutableDictionary *error = [[NSMutableDictionary alloc] init];
   if (cancelled) {
-    [error setValue:[NSNumber numberWithBool:YES] forKey:@"uesr cancel"];
+    [error setValue:[NSNumber numberWithBool:YES] forKey:@"cancel"];
   } else {
     [error setValue:@"不知名原因导致登陆失败" forKey:@"error"];
   }
