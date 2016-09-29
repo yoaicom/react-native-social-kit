@@ -324,8 +324,16 @@ SDKNAME表示Weixin、Weibo、QQ ,Ali 下同
 | key         | value                                    | Weixin |  Weibo  |   QQ    |
 | ----------- | ---------------------------------------- | ------ | :-----: | :-----: |
 | redirectUrl | 微博授权回调页，可不填，默认为"https://api.weibo.com/oauth2/default.html"， | NA     |   OK    |   NA    |
-| scope       | 授权的权限范围，可不填，默认最低权限                       | NA     | Not Yet | Not Yet |
-| permissions | 发送授权范围请求       | NA     | NA | OK |
+| scope①       | 授权的权限范围，可不填，默认最低权限                       | NA     | OK | NA |
+| permissions② | 发送授权范围请求       | NA     | NA | OK |
+
+①:scope 传入字符串,为微博权限范围 默认为"",详见下图
+
+![scope](./gif/scope.png)
+
+②:permissions,传入数组,为QQ权限范围,默认为 [kOPEN_PERMISSION_ADD_SHARE,kOPEN_PERMISSION_GET_USER_INFO,kOPEN_PERMISSION_GET_SIMPLE_USER_INFO] 详细参数见下图 
+
+![scope](./gif/permissions.png)
 
 ###### data
 
