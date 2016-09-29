@@ -292,9 +292,9 @@ SDKNAME表示Weixin、Weibo、QQ ,Ali 下同
 ```
   componentWillMount() {
     // 注册App
-    QQ.registerApp({
+    QQ.registerApp(
       appId: "222222"
-    }, (data) => {
+    , (data) => {
     });
   }
 ```
