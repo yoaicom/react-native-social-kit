@@ -209,9 +209,9 @@ RCT_EXPORT_METHOD(share: (NSDictionary *)config : (RCTResponseSenderBlock)callba
     if (response.statusCode == WeiboSDKResponseStatusCodeSuccess) {
       WBSendMessageToWeiboResponse *shareResponse = (WBSendMessageToWeiboResponse *)response;
       NSDictionary *userInfo = shareResponse.userInfo;
-      NSDictionary *requestUserInfo = shareResponse.requestUserInfo;
       NSString *statusCode = [NSString stringWithFormat:@"%d", (int)response.statusCode];
       [result setValue:userInfo forKey:@"userInfo"];
+      
     }
     shareCallback(@[result]);
     shareCallback = nil;

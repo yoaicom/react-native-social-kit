@@ -8,7 +8,7 @@ static RCTResponseSenderBlock shareCallback;
 + (BOOL)handleOpenURL:(NSURL *)url {
   NSLog(@"%@", @"qq handle");
   QQModule *module = [[QQModule alloc]init];
-  return [QQApiInterface handleOpenURL:url delegate:module];
+  return [TencentOAuth HandleOpenURL:url] || [QQApiInterface handleOpenURL:url delegate:module];
   
 }
 
@@ -106,52 +106,6 @@ RCT_EXPORT_METHOD(share : (NSDictionary *)config : (RCTResponseSenderBlock)callb
     [QQApiInterface sendReq:req];
   }
   
-}
-
-- (NSString *)getErrorInfoWithInt:(QQApiSendResultCode)code {
-  NSString *errorInfo;
-  switch (code) {
-    case 0:
-      errorInfo = @"SENDSUCESS";
-      break;
-    case 1:
-      errorInfo = @"QQNOTINSTALLED";
-      break;
-    case 2:
-      errorInfo = @"QQNOTSUPPORTAPI";
-      break;
-    case 3:
-      errorInfo = @"MESSAGETYPEINVALID";
-      break;
-    case 4:
-      errorInfo = @"MESSAGECONTENTNULL";
-      break;
-    case 5:
-      errorInfo = @"MESSAGECONTENTINVALID";
-      break;
-    case 6:
-      errorInfo = @"APPNOTREGISTED";
-      break;
-    case 7:
-      errorInfo = @"APPSHAREASYNC";
-      break;
-    case 8:
-      errorInfo = @"QQNOTSUPPORTAPI_WITH_ERRORSHOW";
-      break;
-    case -1:
-      errorInfo = @"SENDFAILD";
-      break;
-    case 10000:
-      errorInfo = @"QZONENOTSUPPORTTEXT";
-      break;
-    case 10001:
-      errorInfo = @"QZONENOTSUPPORTIMAGE";
-      break;
-    default:
-      break;
-  }
-  
-  return errorInfo;
 }
 
 //授权登录
