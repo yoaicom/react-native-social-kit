@@ -206,13 +206,6 @@ RCT_EXPORT_METHOD(share: (NSDictionary *)config : (RCTResponseSenderBlock)callba
     authCallback(@[result]);
     authCallback = nil;
   } else if ([response isKindOfClass:WBSendMessageToWeiboResponse.class]) {
-    if (response.statusCode == WeiboSDKResponseStatusCodeSuccess) {
-      WBSendMessageToWeiboResponse *shareResponse = (WBSendMessageToWeiboResponse *)response;
-      NSDictionary *userInfo = shareResponse.userInfo;
-      NSString *statusCode = [NSString stringWithFormat:@"%d", (int)response.statusCode];
-      [result setValue:userInfo forKey:@"userInfo"];
-      
-    }
     shareCallback(@[result]);
     shareCallback = nil;
   }

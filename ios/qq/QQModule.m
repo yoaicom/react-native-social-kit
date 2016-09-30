@@ -197,10 +197,6 @@ RCT_EXPORT_METHOD(authorize : (NSDictionary *)config : (RCTResponseSenderBlock)c
     [result setValue:resultString forKey:@"error"];
   }
   
-  [result setValue:resp.errorDescription forKey:@"errorDescription"];
-  [result setValue:resp.extendInfo forKey:@"extendInfo"];
-  [result setValue:[NSNumber numberWithInt: resp.type] forKey:@"type"];
-  
   shareCallback(@[result]);
 }
 

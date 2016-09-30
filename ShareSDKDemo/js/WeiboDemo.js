@@ -99,6 +99,7 @@ export default class WeiboSDK extends Component {
       });
   }
 
+  //分享方法
   shareTextToWeibo() {
     Weibo.share({
       text: content.text.text,
@@ -154,16 +155,7 @@ export default class WeiboSDK extends Component {
     });
   }
 
-
   //Api方法
-  apiHandler(apiName) {
-    if (apiName === "openWeiboApp") {
-      this.openWeiboApp();
-    } else if (apiName === "authorize") {
-      this.authorize();
-    }
-  }
-
   openWeiboApp() {
     Weibo.openWeiboApp((data) => {
       this.setState({
@@ -308,8 +300,6 @@ export default class WeiboSDK extends Component {
     }
   }
 
-
-  //分享方法
   shareMessage() {
     if (this.state.messageType == 'text') {
       this.shareTextToWeibo();
@@ -324,6 +314,13 @@ export default class WeiboSDK extends Component {
     }
   }
 
+  apiHandler(apiName) {
+    if (apiName === "openWeiboApp") {
+      this.openWeiboApp();
+    } else if (apiName === "authorize") {
+      this.authorize();
+    }
+  }
 
 
 }

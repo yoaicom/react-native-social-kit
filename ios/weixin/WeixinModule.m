@@ -270,13 +270,6 @@ typedef void (^completionBlock)(NSError *error, UIImage *image);
       authCallback = nil;
       authStateString = nil;
     } else if ([resp isKindOfClass:[SendMessageToWXResp class]]) {
-      if (errCode == WXSuccess) {
-        SendMessageToWXResp *messageResp = (SendMessageToWXResp *)resp;
-        NSString *lang = messageResp.lang;
-        NSString *country = messageResp.country;
-        [result setValue:lang forKey:@"lang"];
-        [result setValue:country forKey:@"country"];
-      }
       shareCallback(@[ result ]);
       shareCallback = nil;
     } else if ([resp isKindOfClass:[PayResp class]]) {

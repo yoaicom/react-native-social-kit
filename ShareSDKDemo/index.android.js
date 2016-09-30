@@ -9,17 +9,15 @@ import {
   AppRegistry,
 } from 'react-native';
 
-import Demo from './Demo';
-import WeixinDemo from './js/WeixinDemo';
-import WeiboDemo from './js/WeiboDemo';
-import QQDemo from './js/QQDemo';
+import Demo from './js/Demo';
 
 class demo extends Component {
   render() {
     return (
-      <QQDemo />
+      <Demo/>
     );
   }
 }
+
 
 AppRegistry.registerComponent('demo', () => demo);
