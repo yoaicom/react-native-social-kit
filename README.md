@@ -6,7 +6,7 @@
 **项目仍在开发中，功能不稳定，请耐心等待。**
 
 # Demo
-![Demo](./gif/Demo.gi)
+![Demo](./gif/Demo.gif)
 
 
 # 安装
@@ -293,7 +293,7 @@ SDKNAME表示Weixin、Weibo、QQ ,Ali 下同
   componentWillMount() {
     // 注册App
     QQ.registerApp(
-      appId: "222222"
+      "222222"
     , (data) => {
     });
   }
@@ -408,29 +408,6 @@ config内配置内容参数见下表
 | success| 如果存在此字段，表示分享成功  |   OK  |  OK  |  OK  |
 | error  | 如果存在此字段，表示发生了错误  |   OK  |  OK  |  OK  |
 | cancel | 如果为true，表示用户取消了分享 |   OK  |  OK  |  OK  |
-
-微信分享结果
-
-| key     | value |
-| ------- | ----- |
-| country |  微信用户当前国家信息     |
-| lang    |  微信客户端当前语言     |
-
-微博分享结果
-
-| key              | value |
-| ---------------- | ----- |
-| userInfo  |  自定义信息字典，用于数据传输过程中存储相关的上下文环境数据  |
-
-QQ分享结果
-
-| key              | value |
-| ---------------- | ----- |
-| errorDescription |   具体错误描述信息    |
-| extendInfo       |   扩展信息    |
-| type             |   应答消息类型①    |
-
-①: 0:< 第三方应用 -> 手Q，第三方应用应答消息展现结果; 1:< 第三方应用 -> 手Q，第三方应用回应发往手Q的消息; 2:< 手Q -> 第三方应用，手Q应答处理分享消息的结果
 
 
 以微信图片分享为例,代码如下
