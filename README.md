@@ -343,27 +343,27 @@ appKey/appId  可在各个开放平台注册获得
 
 | key     | value |
 | ------- | ----- |
-| code    |       |
-| country |       |
-| lang    |       |
+| code    |  用户换取access_token的code     |
+| country |  微信用户当前国家信息     |
+| lang    |  微信客户端当前语言     |
 
 微博授权结果
 
 | key              | value |
 | ---------------- | ----- |
-| requestUserInfo  |       |
-| uid              |       |
-| accessToken      |       |
-| refreshToken     |       |
-| expiresInSeconds |       |
+| requestUserInfo  |  对应的 request 中的自定义信息字典     |
+| uid              |  用户ID    |
+| accessToken      |  认证口令     |
+| refreshToken     |  当认证口令过期时用于换取认证口令的更新口令     |
+| expiresInSeconds |  认证过期时间     |
 
 QQ授权结果
 
 | key              | value |
 | ---------------- | ----- |
-| openId           |       |
-| accessToken      |       |
-| expiresInSeconds |       |
+| openId           |   用户授权登录后对该用户的唯一标识    |
+| accessToken      |   Access Token凭证，用于后续访问各开放接口    |
+| expiresInSeconds |   Access Token的失效时间    |
 
 以微信为例,授权代码如下
 
@@ -397,6 +397,39 @@ config内配置内容参数见下表
 ③: data参数为实际数据链接,如分享music时data表示后缀为.mp3的url.
 
 ④: 在微博中 text,image 于其他多媒体链接分别独立,可以同时分享(iOS端图片和多媒体暂时无法同时分享).QQ分享中,text与image配置title,description,thumb,属性生效.
+
+###### data
+
+通用分享结果
+
+| key    | value             | Weixin | Weibo |  QQ  |
+| ------ | ----------------- | :----: | :---: | :--: |
+| error  | 如果存在此字段，表示发生了错误  |   OK  |  OK  |  OK  |
+| cancel | 如果为true，表示用户取消了分享 |   OK  |  OK  |  OK  |
+
+微信分享结果
+
+| key     | value |
+| ------- | ----- |
+| country |  微信用户当前国家信息     |
+| lang    |  微信客户端当前语言     |
+
+微博分享结果
+
+| key              | value |
+| ---------------- | ----- |
+| userInfo  |  自定义信息字典，用于数据传输过程中存储相关的上下文环境数据  |
+
+QQ分享结果
+
+| key              | value |
+| ---------------- | ----- |
+| errorDescription |   具体错误描述信息    |
+| extendInfo       |   扩展信息    |
+| type             |   应答消息类型①    |
+
+①: 0:< 第三方应用 -> 手Q，第三方应用应答消息展现结果; 1:< 第三方应用 -> 手Q，第三方应用回应发往手Q的消息; 2:< 手Q -> 第三方应用，手Q应答处理分享消息的结果
+
 
 以微信图片分享为例,代码如下
 
