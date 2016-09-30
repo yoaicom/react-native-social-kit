@@ -336,6 +336,7 @@ appKey/appId  可在各个开放平台注册获得
 
 | key    | value             | Weixin | Weibo |  QQ  |
 | ------ | ----------------- | :----: | :---: | :--: |
+| success| 如果存在此字段，表示授权成功  |   OK  |  OK  |  OK  |
 | error  | 如果存在此字段，表示发生了错误  |   OK  |  OK  |  OK  |
 | cancel | 如果为true，表示用户取消了授权 |   OK  |  OK  |  OK  |
 
@@ -404,6 +405,7 @@ config内配置内容参数见下表
 
 | key    | value             | Weixin | Weibo |  QQ  |
 | ------ | ----------------- | :----: | :---: | :--: |
+| success| 如果存在此字段，表示分享成功  |   OK  |  OK  |  OK  |
 | error  | 如果存在此字段，表示发生了错误  |   OK  |  OK  |  OK  |
 | cancel | 如果为true，表示用户取消了分享 |   OK  |  OK  |  OK  |
 
