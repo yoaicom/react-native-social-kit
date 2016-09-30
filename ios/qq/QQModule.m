@@ -1,12 +1,15 @@
 #import "QQModule.h"
 
 static RCTResponseSenderBlock authCallback;
+static RCTResponseSenderBlock shareCallback;
 
 @implementation QQModule
 
 + (BOOL)handleOpenURL:(NSURL *)url {
   NSLog(@"%@", @"qq handle");
-  return [TencentOAuth HandleOpenURL:url];
+  QQModule *module = [[QQModule alloc]init];
+  return [QQApiInterface handleOpenURL:url delegate:module];
+  
 }
 
 // QQSDK要求必须在主线程调用授权方法
@@ -19,6 +22,7 @@ RCT_EXPORT_MODULE(QQ);
 //注册App
 RCT_EXPORT_METHOD(registerApp : (NSString *)appId : (RCTResponseSenderBlock)callback) {
   NSLog(@"%@", @"注册QQ");
+  
   BOOL appRegistered = NO;
   NSMutableDictionary *result = [NSMutableDictionary dictionaryWithCapacity:5];
   if (appId && appId.length > 0) {
@@ -29,23 +33,12 @@ RCT_EXPORT_METHOD(registerApp : (NSString *)appId : (RCTResponseSenderBlock)call
     [result setValue:[NSNumber numberWithBool:[TencentOAuth iphoneQZoneSupportSSOLogin]] forKey: @"iphoneQZoneSupportSSOLogin"];
     callback(@[result]);
   }
-  
-}
-
-- (BOOL)onTencentReq:(TencentApiReq *)req {
-  NSLog(@"%s", __FUNCTION__);
-  NSLog(@"%@", @"接收req");
-  return YES;
-}
-
-- (BOOL)onTencentResp:(TencentApiResp *)resp {
-  NSLog(@"%s", __FUNCTION__);
-  NSLog(@"%@", @"接收resp");
-  return YES;
 }
 
 RCT_EXPORT_METHOD(share : (NSDictionary *)config : (RCTResponseSenderBlock)callback ) {
   QQApiObject *object;
+  
+  shareCallback = callback;
   
   NSString *title = [config objectForKey:@"title"];
   NSString *description = [config objectForKey:@"description"];
@@ -103,26 +96,16 @@ RCT_EXPORT_METHOD(share : (NSDictionary *)config : (RCTResponseSenderBlock)callb
   
   NSString *scene = [config objectForKey:@"scene"];
   
-  int errorInfo;
+  QQApiSendResultCode errorInfo;
   
   SendMessageToQQReq *req = [SendMessageToQQReq reqWithContent:object];
   
   if ([scene isEqualToString:@"qzone"]) {
-    errorInfo =  [QQApiInterface SendReqToQZone:req];
+    [QQApiInterface SendReqToQZone:req];
   }  else {
-    errorInfo =  [QQApiInterface sendReq:req];
+    [QQApiInterface sendReq:req];
   }
   
-  NSMutableDictionary *result = [NSMutableDictionary dictionaryWithCapacity:10];
-  if (errorInfo == 0) {
-    [result setValue:[NSNumber numberWithBool:YES] forKey:@"success"];
-  } else if (errorInfo == 7) {
-    [result setValue:[NSNumber numberWithBool:YES] forKey:@"cancel"];
-  } else {
-    [result setValue:[self getErrorInfoWithInt:errorInfo] forKey:@"error"];
-  }
-  
-  callback(@[result]);
 }
 
 - (NSString *)getErrorInfoWithInt:(QQApiSendResultCode)code {
@@ -238,6 +221,33 @@ RCT_EXPORT_METHOD(authorize : (NSDictionary *)config : (RCTResponseSenderBlock)c
   
   authCallback(@[error]);
   authCallback = nil;
+}
+
+- (void)onReq:(QQBaseReq *)req{
+  NSLog(@"%s",__FUNCTION__);
+  NSLog(@"%@",@"接受req");
+}
+
+- (void)onResp:(QQBaseResp *)resp{
+  NSLog(@"%s",__FUNCTION__);
+  NSLog(@"%@",@"接收resp");
+
+  NSMutableDictionary *result = [NSMutableDictionary dictionaryWithCapacity:4];
+  
+  NSString *resultString = resp.result;
+  if ([resultString isEqualToString:@"0"]) {
+    [result setValue:[NSNumber numberWithBool:YES] forKey:@"success"];
+  } else if ([resultString isEqualToString:@"-4"]) {
+    [result setValue:[NSNumber numberWithBool:YES] forKey:@"cancel"];
+  } else {
+    [result setValue:resultString forKey:@"error"];
+  }
+  
+  [result setValue:resp.errorDescription forKey:@"errorDescription"];
+  [result setValue:resp.extendInfo forKey:@"extendInfo"];
+  [result setValue:[NSNumber numberWithInt: resp.type] forKey:@"type"];
+  
+  shareCallback(@[result]);
 }
 
 - (void)dealloc {

@@ -117,7 +117,85 @@ export default class QQSDK extends Component {
     //   );
     // }, 1000);
   }
-  
+
+  shareTextToQQ(scene) {
+    QQ.share({
+      text: content.text.text,
+      scene: scene
+    }, (data) => {
+      this.setState({shareResult: JSON.stringify(data)})
+    });
+  }
+
+  shareImageToQQ(scene) {
+    QQ.share({
+      title: content.image.title,
+      description: content.image.description,
+      scene: scene,
+      image: content.image.image,
+    }, (data) => {
+      this.setState({shareResult: JSON.stringify(data)})
+    });
+  }
+  shareWebPageToQQ(scene) {
+    QQ.share({
+      title: content.webPage.title,
+      description: content.webPage.description,
+      thumb: content.webPage.thumb,
+      webpage: content.webPage.webpage,
+      // thumb: "http://a.hiphotos.baidu.com/zhidao/pic/item/ac6eddc451da81cb91b89bd25666d01609243156.jpg",
+      scene: scene,
+    }, (data) => {
+      this.setState({shareResult: JSON.stringify(data)})
+    });
+  }
+
+  shareMusicToQQ(scene) {
+    QQ.share({
+      title: content.music.title,
+      description: content.music.description,
+      thumb: content.music.thumb,
+      music: content.music.music,
+      // thumb: "http://a.hiphotos.baidu.com/zhidao/pic/item/ac6eddc451da81cb91b89bd25666d01609243156.jpg",
+      data: content.music.data,
+      scene: scene,
+    }, (data) => {
+      this.setState({shareResult: JSON.stringify(data)})
+    });
+  }
+
+  shareVideoToQQ(scene) {
+    QQ.share({
+      title: content.video.title,
+      description: content.video.description,
+      thumb: content.video.thumb,
+      // thumb: "http://a.hiphotos.baidu.com/zhidao/pic/item/ac6eddc451da81cb91b89bd25666d01609243156.jpg",
+      video: content.video.video,
+      data: content.video.data,
+      scene: scene,
+    }, (data) => {
+      this.setState({shareResult: JSON.stringify(data)})
+    });
+  }
+
+
+  //Api方法
+  apiHandler(apiName) {
+    if (apiName === "authorize") {
+      this.auth();
+    }
+  }
+
+  auth() {
+    QQ.authorize(
+      null,
+      (data)=> {
+        this.setState({apiResult: data})
+      }
+    )
+  }
+
+
   render() {
 
     let dataSource = new ListView.DataSource({
@@ -194,7 +272,6 @@ export default class QQSDK extends Component {
         </TouchableOpacity>
       )
     });
-    console.log('sectionID = ' + sectionID);
     let resultComponent = this.getResultComponent(rowData, sectionID);
     return (
       <View
@@ -266,81 +343,5 @@ export default class QQSDK extends Component {
     }
   }
 
-  shareTextToQQ(scene) {
-    QQ.share({
-      text: content.text.text,
-      scene: scene
-    }, (data) => {
-      this.setState({shareResult: JSON.stringify(data)})
-    });
-  }
-
-  shareImageToQQ(scene) {
-    QQ.share({
-      title: content.image.title,
-      description: content.image.description,
-      scene: scene,
-      image: content.image.image,
-    }, (data) => {
-      this.setState({shareResult: JSON.stringify(data)})
-    });
-  }
-  shareWebPageToQQ(scene) {
-    QQ.share({
-      title: content.webPage.title,
-      description: content.webPage.description,
-      thumb: content.webPage.thumb,
-      webpage: content.webPage.webpage,
-      // thumb: "http://a.hiphotos.baidu.com/zhidao/pic/item/ac6eddc451da81cb91b89bd25666d01609243156.jpg",
-      scene: scene,
-    }, (data) => {
-      this.setState({shareResult: JSON.stringify(data)})
-    });
-  }
-
-  shareMusicToQQ(scene) {
-    QQ.share({
-      title: content.music.title,
-      description: content.music.description,
-      thumb: content.music.thumb,
-      music: content.music.music,
-      // thumb: "http://a.hiphotos.baidu.com/zhidao/pic/item/ac6eddc451da81cb91b89bd25666d01609243156.jpg",
-      data: content.music.data,
-      scene: scene,
-    }, (data) => {
-      this.setState({shareResult: JSON.stringify(data)})
-    });
-  }
-
-  shareVideoToQQ(scene) {
-    QQ.share({
-      title: content.video.title,
-      description: content.video.description,
-      thumb: content.video.thumb,
-      // thumb: "http://a.hiphotos.baidu.com/zhidao/pic/item/ac6eddc451da81cb91b89bd25666d01609243156.jpg",
-      video: content.video.video,
-      data: content.video.data,
-      scene: scene,
-    }, (data) => {
-      this.setState({shareResult: JSON.stringify(data)})
-    });
-  }
-
-
-  //Api方法
-  apiHandler(apiName) {
-   if (apiName === "authorize") {
-      this.auth();
-    }
-  }
-
-  auth() {
-    QQ.authorize(
-      null,
-      (data)=> {
-        this.setState({apiResult: data})
-      }
-    )
-  }
 
 }

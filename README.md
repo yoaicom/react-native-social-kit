@@ -326,9 +326,8 @@ appKey/appId  可在各个开放平台注册获得
 | redirectUrl | 微博授权回调页，可不填，默认为"https://api.weibo.com/oauth2/default.html"， | NA     |   OK    |   NA    |
 | scope①     | 授权的权限范围，可不填，默认最低权限                       | NA     | OK | NA |
 
-①:scope 传入字符串,为微博权限范围 默认为"",详见下图
+①:[scope](http://open.weibo.com/wiki/Scope) 传入字符串,为微博权限范围 默认为""
 
-![scope](./gif/scope.png)
 
 
 ###### data
@@ -352,7 +351,7 @@ appKey/appId  可在各个开放平台注册获得
 
 | key              | value |
 | ---------------- | ----- |
-|requestUserInfo   |       |
+| requestUserInfo  |       |
 | uid              |       |
 | accessToken      |       |
 | refreshToken     |       |

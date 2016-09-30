@@ -99,6 +99,86 @@ export default class WeiboSDK extends Component {
       });
   }
 
+  shareTextToWeibo() {
+    Weibo.share({
+      text: content.text.text,
+    }, (data) => {
+      this.setState({shareResult: JSON.stringify(data)})
+    });
+  }
+
+  shareImageToWeibo() {
+    Weibo.share({
+      text: content.image.text,
+      image: content.image.image,
+    }, (data) => {
+      this.setState({shareResult: JSON.stringify(data)})
+    });
+  }
+
+  shareWebPageToWeibo() {
+    Weibo.share({
+      text: content.webPage.text,
+      title: content.webPage.title,
+      description: content.webPage.description,
+      thumb: content.webPage.thumb,
+      webpage: content.webPage.webpage,
+    }, (data) => {
+      this.setState({shareResult: JSON.stringify(data)})
+    });
+  }
+
+  shareMusicToWeibo() {
+    Weibo.share({
+      text: content.music.text,
+      title: content.music.title,
+      description: content.music.description,
+      thumb: content.music.thumb,
+      music: content.music.music,
+      data: content.music.data,
+    }, (data) => {
+      this.setState({shareResult: JSON.stringify(data)})
+    });
+  }
+
+  shareVideoToWeibo() {
+    Weibo.share({
+      text: content.video.text,
+      title: content.video.title,
+      description: content.video.description,
+      thumb: content.video.thumb,
+      video: content.video.video,
+      data: content.video.data,
+    }, (data) => {
+      this.setState({shareResult: JSON.stringify(data)})
+    });
+  }
+
+
+  //Api方法
+  apiHandler(apiName) {
+    if (apiName === "openWeiboApp") {
+      this.openWeiboApp();
+    } else if (apiName === "authorize") {
+      this.authorize();
+    }
+  }
+
+  openWeiboApp() {
+    Weibo.openWeiboApp((data) => {
+      this.setState({
+        apiResult: data
+      })
+    })
+  }
+  
+  authorize() {
+    Weibo.authorize({redirectUrl: "https://api.weibo.com/oauth2/default.html", scope: "all"}, (data)=> {
+      this.setState({apiResult: data})
+    })
+  }
+  
+  
   render() {
 
     let dataSource = new ListView.DataSource({
@@ -244,84 +324,6 @@ export default class WeiboSDK extends Component {
     }
   }
 
-  shareTextToWeibo() {
-    Weibo.share({
-      text: content.text.text,
-    }, (data) => {
-      this.setState({shareResult: JSON.stringify(data)})
-    });
-  }
 
-  shareImageToWeibo() {
-    Weibo.share({
-      text: content.image.text,
-      image: content.image.image,
-    }, (data) => {
-      this.setState({shareResult: JSON.stringify(data)})
-    });
-  }
-
-  shareWebPageToWeibo() {
-    Weibo.share({
-      text: content.webPage.text,
-      title: content.webPage.title,
-      description: content.webPage.description,
-      thumb: content.webPage.thumb,
-      webpage: content.webPage.webpage,
-    }, (data) => {
-      this.setState({shareResult: JSON.stringify(data)})
-    });
-  }
-
-  shareMusicToWeibo() {
-    Weibo.share({
-      text: content.music.text,
-      title: content.music.title,
-      description: content.music.description,
-      thumb: content.music.thumb,
-      music: content.music.music,
-      data: content.music.data,
-    }, (data) => {
-      this.setState({shareResult: JSON.stringify(data)})
-    });
-  }
-
-  shareVideoToWeibo() {
-    Weibo.share({
-      text: content.video.text,
-      title: content.video.title,
-      description: content.video.description,
-      thumb: content.video.thumb,
-      video: content.video.video,
-      data: content.video.data,
-    }, (data) => {
-      this.setState({shareResult: JSON.stringify(data)})
-    });
-  }
-
-
-  //Api方法
-  apiHandler(apiName) {
-    if (apiName === "openWeiboApp") {
-      this.openWeiboApp();
-    } else if (apiName === "authorize") {
-      this.authorize();
-    }
-  }
-
-  openWeiboApp() {
-    Weibo.openWeiboApp((data) => {
-      this.setState({
-        apiResult: data
-      })
-    })
-  }
-
-
-  authorize() {
-    Weibo.authorize({redirectUrl: "https://api.weibo.com/oauth2/default.html", scope: "all"}, (data)=> {
-      this.setState({apiResult: data})
-    })
-  }
 
 }

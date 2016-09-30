@@ -114,6 +114,108 @@ export default class WeixinSDK extends Component {
     console.log('componentDidMount');
     Weixin.registerApp('wx1dd0b08688eecaef', this.callback);
   }
+
+
+  shareText(scene) {
+    Weixin.share({
+      text: content.text.text,
+      scene: scene,
+      //scene: 'favorite'
+      //scene: 'timeline'
+    }, this.shareCallback.bind(this));
+  }
+
+  shareImage(scene) {
+    Weixin.share({
+      image: content.image.image,
+      // image:'http://static.yoaicdn.com/shoppc/images/cover_img_e1e9e6b.jpg',
+      scene: scene,
+    }, this.shareCallback.bind(this));
+  }
+
+  shareMusic(scene) {
+    Weixin.share({
+      music: content.music.music,
+      data: content.music.data,
+      title: content.music.title,
+      description: content.music.description,
+      scene: scene,
+      thumb: content.music.thumb
+    }, this.shareCallback.bind(this));
+  }
+
+  shareVideo(scene) {
+    Weixin.share({
+      video: content.video.video,
+      title:content.video.title,
+      description: content.video.description,
+      scene: scene,
+      thumb: content.video.thumb
+    }, this.shareCallback.bind(this));
+  }
+
+  shareWebpage(scene) {
+    Weixin.share({
+      webpage: content.webPage.webpage,
+      title: content.webPage.title,
+      description: content.webPage.description,
+      scene: scene,
+      thumb: content.webPage.thumb
+    }, this.shareCallback.bind(this));
+  }
+
+  //Api方法
+  apiHandler(apiName) {
+    if (apiName === "authorize") {
+      this.auth();
+    } else if (apiName === "pay") {
+      this.pay();
+    } else if(apiName === "openWXApp") {
+      this.openWeixinApp();
+    }
+  }
+
+  auth() {
+    Weixin.authorize(null, this.apiCallback.bind(this));
+  }
+
+  pay() {
+    Weixin.pay({
+      appId: 'wxb4ba3c02aa476ea1',
+      partnerId: '1305176001',
+      prepayId: 'wx20160825110537d87d6c1bc40918186006',
+      package: 'Sign=WXPay',
+      nonceStr: '66b7fef4fe75bbebb3b8685fd6939234',
+      timeStamp: '1472094337',
+      sign: '616424E003D84D6876B8F5E5F5D3CD17'
+    }, this.apiCallback.bind(this));
+  }
+
+  openWeixinApp() {
+    Weixin.openWeixinApp(this.apiCallback.bind(this));
+  }
+
+  callback(result) {
+    console.log("result..." + JSON.stringify(result));
+    // setTimeout(() => {
+    //   Alert.alert(
+    //     'Alert',
+    //     JSON.stringify(result),
+    //     [
+    //       {text: 'OK'}
+    //     ]
+    //   );
+    // }, 1000);
+  }
+
+  shareCallback(result) {
+    console.log(JSON.stringify(result));
+    this.setState({shareResult:JSON.stringify(result)})
+  }
+
+  apiCallback(result) {
+    this.setState({apiResult:result})
+  }
   
   render() {
 
@@ -262,104 +364,4 @@ export default class WeixinSDK extends Component {
     }
   }
 
-  shareText(scene) {
-    Weixin.share({
-      text: content.text.text,
-      scene: scene,
-      //scene: 'favorite'
-      //scene: 'timeline'
-    }, this.shareCallback.bind(this));
-  }
-
-  shareImage(scene) {
-    Weixin.share({
-      image: content.image.image,
-      // image:'http://static.yoaicdn.com/shoppc/images/cover_img_e1e9e6b.jpg',
-      scene: scene,
-    }, this.shareCallback.bind(this));
-  }
-
-  shareMusic(scene) {
-    Weixin.share({
-      music: content.music.music,
-      data: content.music.data,
-      title: content.music.title,
-      description: content.music.description,
-      scene: scene,
-      thumb: content.music.thumb
-    }, this.shareCallback.bind(this));
-  }
-
-  shareVideo(scene) {
-    Weixin.share({
-      video: content.video.video,
-      title:content.video.title,
-      description: content.video.description,
-      scene: scene,
-      thumb: content.video.thumb
-    }, this.shareCallback.bind(this));
-  }
-
-  shareWebpage(scene) {
-    Weixin.share({
-      webpage: content.webPage.webpage,
-      title: content.webPage.title,
-      description: content.webPage.description,
-      scene: scene,
-      thumb: content.webPage.thumb
-    }, this.shareCallback.bind(this));
-  }
-
-  //Api方法
-  apiHandler(apiName) {
-    if (apiName === "authorize") {
-      this.auth();
-    } else if (apiName === "pay") {
-      this.pay();
-    } else if(apiName === "openWXApp") {
-      this.openWeixinApp();
-    }
-  }
-
-  auth() {
-    Weixin.authorize(null, this.apiCallback.bind(this));
-  }
-
-  pay() {
-    Weixin.pay({
-      appId: 'wxb4ba3c02aa476ea1',
-      partnerId: '1305176001',
-      prepayId: 'wx20160825110537d87d6c1bc40918186006',
-      package: 'Sign=WXPay',
-      nonceStr: '66b7fef4fe75bbebb3b8685fd6939234',
-      timeStamp: '1472094337',
-      sign: '616424E003D84D6876B8F5E5F5D3CD17'
-    }, this.apiCallback.bind(this));
-  }
-
-  openWeixinApp() {
-    Weixin.openWeixinApp(this.apiCallback.bind(this));
-  }
-
-  callback(result) {
-    console.log("result..." + JSON.stringify(result));
-    // setTimeout(() => {
-    //   Alert.alert(
-    //     'Alert',
-    //     JSON.stringify(result),
-    //     [
-    //       {text: 'OK'}
-    //     ]
-    //   );
-    // }, 1000);
-  }
-
-  shareCallback(result) {
-    console.log(JSON.stringify(result));
-    this.setState({shareResult:JSON.stringify(result)})
-  }
-
-  apiCallback(result) {
-    this.setState({apiResult:result})
-  }
 }
