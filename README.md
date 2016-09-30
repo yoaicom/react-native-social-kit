@@ -308,7 +308,7 @@ SDKNAME表示Weixin、Weibo、QQ ,Ali 下同
 | QQ              | appId                 |
 
 
-
+appKey/appId  可在各个开放平台注册获得
 
 # 授权登陆API
 
@@ -324,16 +324,12 @@ SDKNAME表示Weixin、Weibo、QQ ,Ali 下同
 | key         | value                                    | Weixin |  Weibo  |   QQ    |
 | ----------- | ---------------------------------------- | ------ | :-----: | :-----: |
 | redirectUrl | 微博授权回调页，可不填，默认为"https://api.weibo.com/oauth2/default.html"， | NA     |   OK    |   NA    |
-| scope①       | 授权的权限范围，可不填，默认最低权限                       | NA     | OK | NA |
-| permissions② | 发送授权范围请求       | NA     | NA | OK |
+| scope①     | 授权的权限范围，可不填，默认最低权限                       | NA     | OK | NA |
 
 ①:scope 传入字符串,为微博权限范围 默认为"",详见下图
 
 ![scope](./gif/scope.png)
 
-②:permissions,传入数组,为QQ权限范围,默认为 [kOPEN_PERMISSION_ADD_SHARE,kOPEN_PERMISSION_GET_USER_INFO,kOPEN_PERMISSION_GET_SIMPLE_USER_INFO] 详细参数见下图 
-
-![scope](./gif/permissions.png)
 
 ###### data
 
@@ -341,8 +337,8 @@ SDKNAME表示Weixin、Weibo、QQ ,Ali 下同
 
 | key    | value             | Weixin | Weibo |  QQ  |
 | ------ | ----------------- | :----: | :---: | :--: |
-| error  | 如果存在此字段，表示发生了错误   |   OK   |  OK   |  OK  |
-| cancel | 如果为true，表示用户取消了授权 |   OK   |  OK   |  OK  |
+| error  | 如果存在此字段，表示发生了错误  |   OK  |  OK  |  OK  |
+| cancel | 如果为true，表示用户取消了授权 |   OK  |  OK  |  OK  |
 
 微信授权结果
 
@@ -399,7 +395,7 @@ config内配置内容参数见下表
 
 ②: thumb为缩略图链接地址,微信,微博对缩略图的大小限制在32k,如传入的图片大小超过32k,则会被压缩到32K以内.
 
-③: data参数表示实际数据链接,如分享music时data表示后缀为.mp3的url.
+③: data参数为实际数据链接,如分享music时data表示后缀为.mp3的url.
 
 ④: 在微博中 text,image 于其他多媒体链接分别独立,可以同时分享(iOS端图片和多媒体暂时无法同时分享).QQ分享中,text与image配置title,description,thumb,属性生效.
 
@@ -429,8 +425,8 @@ shareImage(scene) {
 
 | SDKNAME         | config                | 
 | ----------------| --------------------- |
-| Weixin          | {timestamp:'',partnerid:'',prepayid:'',noncestr:'',timeStamp:'',package:'',sign:''} android需要添加appId         | 
-| Ali             | {orderString: '',appScheme:''}          |
+| Weixin          | {timestamp:'',partnerid:'',prepayid:'',noncestr:'',timeStamp:'',package:'',sign:''} android需要添加appId| 
+| Ali             | {orderString: '',appScheme:''} |
 
 
 # 关于我们

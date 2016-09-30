@@ -317,8 +317,8 @@ export default class QQSDK extends Component {
       title: content.video.title,
       description: content.video.description,
       thumb: content.video.thumb,
+      // thumb: "http://a.hiphotos.baidu.com/zhidao/pic/item/ac6eddc451da81cb91b89bd25666d01609243156.jpg",
       video: content.video.video,
-      // previewImageURL: "http://a.hiphotos.baidu.com/zhidao/pic/item/ac6eddc451da81cb91b89bd25666d01609243156.jpg",
       data: content.video.data,
       scene: scene,
     }, (data) => {

@@ -49,7 +49,11 @@ RCT_EXPORT_METHOD(share : (NSDictionary *)config : (RCTResponseSenderBlock)callb
   
   NSString *title = [config objectForKey:@"title"];
   NSString *description = [config objectForKey:@"description"];
-  NSURL *previewImageURL = [NSURL URLWithString:[config objectForKey:@"thumb"]];
+  NSString *thumb = [config objectForKey:@"thumb"];
+  if ([[thumb substringToIndex:1 ] isEqualToString:@"/"]) {
+    thumb = [NSString stringWithFormat:@"file://%@",thumb];
+  }
+  NSURL *previewImageURL = [NSURL URLWithString:thumb];
 
   NSURL *flashURL = [NSURL URLWithString:[config objectForKey:@"data"]];
   
@@ -99,16 +103,26 @@ RCT_EXPORT_METHOD(share : (NSDictionary *)config : (RCTResponseSenderBlock)callb
   
   NSString *scene = [config objectForKey:@"scene"];
   
-  NSString *errorInfo;
+  int errorInfo;
   
   SendMessageToQQReq *req = [SendMessageToQQReq reqWithContent:object];
   
   if ([scene isEqualToString:@"qzone"]) {
-    errorInfo = [self getErrorInfoWithInt: [QQApiInterface SendReqToQZone:req]];
+    errorInfo =  [QQApiInterface SendReqToQZone:req];
   }  else {
-    errorInfo = [self getErrorInfoWithInt:[QQApiInterface sendReq:req]];
+    errorInfo =  [QQApiInterface sendReq:req];
   }
-  callback(@[errorInfo]);
+  
+  NSMutableDictionary *result = [NSMutableDictionary dictionaryWithCapacity:10];
+  if (errorInfo == 0) {
+    [result setValue:[NSNumber numberWithBool:YES] forKey:@"success"];
+  } else if (errorInfo == 7) {
+    [result setValue:[NSNumber numberWithBool:YES] forKey:@"cancel"];
+  } else {
+    [result setValue:[self getErrorInfoWithInt:errorInfo] forKey:@"error"];
+  }
+  
+  callback(@[result]);
 }
 
 - (NSString *)getErrorInfoWithInt:(QQApiSendResultCode)code {
@@ -170,6 +184,9 @@ RCT_EXPORT_METHOD(authorize : (NSDictionary *)config : (RCTResponseSenderBlock)c
     [NSArray arrayWithObjects:kOPEN_PERMISSION_GET_USER_INFO, kOPEN_PERMISSION_GET_SIMPLE_USER_INFO, kOPEN_PERMISSION_ADD_SHARE, nil];
     [permissions addObjectsFromArray:defaultPermissions];
   }
+  
+  NSLog(@"kOPEN_PERMISSION_GET_USER_INFO = %@",kOPEN_PERMISSION_GET_USER_INFO);
+  
   [self.tencentOAuth authorize:permissions];
 }
 

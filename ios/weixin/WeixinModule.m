@@ -105,6 +105,10 @@ RCT_EXPORT_METHOD(share
       if (thumbImage && thumbImage.length > 0) {
         NSLog(@"设置缩略图");
         
+        if ([[thumbImage substringToIndex:1] isEqualToString:@"/"]){
+          thumbImage = [NSString stringWithFormat:@"file://%@",thumbImage];
+        }
+        
         [self getImgaeWithUrl:thumbImage andCompletionBlock:^(NSError *error, UIImage *image) {
           NSData *imageData = UIImageJPEGRepresentation(image, 1.0);
           UIImage *resultImage = [UIImage imageWithData:imageData];

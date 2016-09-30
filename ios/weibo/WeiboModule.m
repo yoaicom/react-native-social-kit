@@ -28,7 +28,7 @@ RCT_EXPORT_METHOD(registerApp : (NSString *)appKey : (RCTResponseSenderBlock)cal
 }
 //打开微博
 RCT_EXPORT_METHOD(openWeiboApp : (RCTResponseSenderBlock)callback) {
-  NSString *result = [NSString stringWithFormat:@"%d", [WeiboSDK openWeiboApp]];
+  NSNumber *result = [NSNumber numberWithBool:[WeiboSDK openWeiboApp]];
   callback(@[result]);
 }
 //授权
