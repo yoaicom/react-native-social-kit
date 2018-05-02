@@ -249,12 +249,6 @@ public class WeiboModule extends ReactContextBaseJavaModule implements ActivityE
     }
   }
 
-  @Override
-  public void onActivityResult(int requestCode, int resultCode, Intent data) {
-    if (ssoHandler != null) {
-      ssoHandler.authorizeCallBack(requestCode, resultCode, data);
-    }
-  }
 
   private static void info(String msg) {
     Utils.info(TAG, msg);
@@ -262,6 +256,18 @@ public class WeiboModule extends ReactContextBaseJavaModule implements ActivityE
 
   private String buildTransaction(final String type) {
     return (type == null) ? String.valueOf(System.currentTimeMillis()) : type + System.currentTimeMillis();
+  }
+
+  @Override
+  public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
+    if (ssoHandler != null) {
+      ssoHandler.authorizeCallBack(requestCode, resultCode, data);
+    }
+  }
+
+  @Override
+  public void onNewIntent(Intent intent) {
+
   }
 
   /**
