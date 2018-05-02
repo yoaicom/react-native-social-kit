@@ -16,6 +16,7 @@ static RCTResponseSenderBlock payResultCallback;
                       }];
     return YES;
   }
+  return NO;
 }
 
 RCT_EXPORT_MODULE(Ali);
