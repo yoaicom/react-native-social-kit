@@ -6,8 +6,8 @@ Pod::Spec.new do |s|
   s.authors = "zt"
   s.license = "MIT"
   s.summary      = "social sdk"
-	s.homepage = "https://github.com/yoaicom/react-native-social-kit"
-  s.source   = { :git => "https://github.com/yoaicom/react-native-social-kit.git"}
+	s.homepage = "https://github.com/cqingwang/react-native-social-kit"
+  s.source   = { :git => "https://github.com/cqingwang/react-native-social-kit.git"}
   s.subspec 'Weixin' do |ss|
     ss.source_files  ="ios/weixin/*.{h,m}","ios/weixin/WeixinSDK/*.{h,m}"
   	ss.resource     = 'ios/weixin/WeixinSDK/*.bundle'

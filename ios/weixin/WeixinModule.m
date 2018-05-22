@@ -194,6 +194,7 @@ typedef void (^completionBlock)(NSError *error, UIImage *image);
      clipped:NO
      resizeMode:RCTResizeModeStretch
      progressBlock:nil
+     partialLoadBlock:nil
      completionBlock:^(NSError *error, UIImage *image) {
        completionBlock(error, image);
      }];
